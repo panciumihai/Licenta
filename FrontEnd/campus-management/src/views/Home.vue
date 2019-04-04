@@ -1,17 +1,18 @@
 <template>
   <div class="home">
-    <h1>Home page</h1>
-    <v-btn class="indigo white--text">CLICKEAZA-MA</v-btn>
-    <Popup></Popup>
+    <NewsPreview></NewsPreview>
   </div>
 </template>
 
 <script>
-import Popup from "@/components/Popup";
+import NewsPreview from "@/components/NewsPreview";
 
 export default {
   components: {
-    Popup
+    NewsPreview
+  },
+  data() {
+    return {};
   }
 };
 </script>

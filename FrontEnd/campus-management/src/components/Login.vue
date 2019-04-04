@@ -1,13 +1,18 @@
 <template>
   <v-dialog max-width="400px" v-model="show">
     <v-card>
-      <v-card-title class="blue--text pb-0">
-        <h2>Completeaza datele pentru a te autentifica!</h2>
-      </v-card-title>
+      <v-toolbar dark color="blue">
+        <v-toolbar-title>Autentificare</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon @click="show = false">
+          <v-icon large>close</v-icon>
+        </v-btn>
+      </v-toolbar>
+
       <v-card-text>
         <v-form class="px-3" ref="form">
           <v-text-field
-            prepend-icon="perm_identity"
+            prepend-icon="person"
             label="Email"
             v-model="email"
             name="input-10-1"

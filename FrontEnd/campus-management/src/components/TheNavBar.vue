@@ -44,7 +44,7 @@
         </v-btn>
       </v-toolbar-items>
     </v-toolbar>
-    <v-navigation-drawer app v-model="drawer" class="primary" width="250"></v-navigation-drawer>
+    <v-navigation-drawer disable-resize-watcher v-model="drawer" app class="primary" width="250"></v-navigation-drawer>
     <Login v-model="dialog"></Login>
   </nav>
 </template>
