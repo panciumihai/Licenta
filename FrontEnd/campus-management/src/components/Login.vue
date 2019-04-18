@@ -1,6 +1,6 @@
 <template>
-  <v-dialog max-width="400px" v-model="show">
-    <v-card>
+  <v-dialog max-width="399px" v-model="show">
+    <v-card class="pr-0">
       <v-toolbar dark color="blue">
         <v-toolbar-title>Autentificare</v-toolbar-title>
         <v-spacer></v-spacer>

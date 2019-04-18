@@ -1,6 +1,8 @@
 <template>
   <div class="home">
     <NewsPreview></NewsPreview>
+    <NewsPreview></NewsPreview>
+    <NewsPreview></NewsPreview>
   </div>
 </template>
 

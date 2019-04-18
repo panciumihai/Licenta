@@ -2,6 +2,9 @@ import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
 import Register from "./views/Register.vue";
+import News from "./views/News.vue";
+import AccommodationRequest from "./views/AccommodationRequest.vue";
+import NewsCreator from "./views/NewsCreator.vue";
 
 Vue.use(Router);
 
@@ -48,6 +51,21 @@ export default new Router({
       path: "/register",
       name: "regiser",
       component: Register
+    },
+    {
+      path: "/news",
+      name: "news",
+      component: News
+    },
+    {
+      path: "/cerereCazare",
+      name: "cerereCazare",
+      component: AccommodationRequest
+    },
+    {
+      path: "/creareAnunt",
+      name: "creareAnunt",
+      component: NewsCreator
     }
   ]
 });

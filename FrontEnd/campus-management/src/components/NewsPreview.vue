@@ -13,13 +13,15 @@
             </v-layout>
           </v-flex>
           <v-flex xs12 md12>
-            <v-img :src="news.image" aspect-ratio="2.75">
+            <v-img :src="news.image" :lazy-src="news.image" aspect-ratio="2.75">
               <v-layout row fill-height align-end>
-                <div class="transparent pa-3 body-2 white--text">
-                  {{ news.content.substring(0,200) }}...
-                  <div
-                    class="blue--text text--lighten-4 body-2 d-inline-flex"
-                  >Click pe postare pentru a vedea mai mult!</div>
+                <div class="transparent">
+                  <div class="pa-3 body-2 white--text">
+                    {{ news.content.substring(0,200) }}...
+                    <div
+                      class="blue--text text--lighten-4 body-2 d-inline-flex"
+                    >Click pe postare pentru a vedea mai mult!</div>
+                  </div>
                 </div>
               </v-layout>
             </v-img>
@@ -45,7 +47,9 @@ export default {
     };
   },
   methods: {
-    goToDetails: function() {}
+    goToDetails: function() {
+      this.$router.push({ name: "news" });
+    }
   }
 };
 </script>
@@ -53,5 +57,6 @@ export default {
 <style scoped>
 .transparent {
   background-color: rgb(0, 0, 0, 0.65) !important;
+  background: rgba(0, 0, 0, 0.65) !important;
 }
 </style>

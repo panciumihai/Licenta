@@ -44,7 +44,41 @@
         </v-btn>
       </v-toolbar-items>
     </v-toolbar>
-    <v-navigation-drawer disable-resize-watcher v-model="drawer" app class="primary" width="250"></v-navigation-drawer>
+    <v-navigation-drawer disable-resize-watcher v-model="drawer" app dark class="blue" width="250">
+      <v-list class="pa-1">
+        <v-list-tile avatar>
+          <v-list-tile-avatar>
+            <img
+              src="https://yt3.ggpht.com/a-/AAuE7mATBPn2Fmw2O1eKHBLGTKT9oCzeEqddNvPxeg=s900-mo-c-c0xffffffff-rj-k-no"
+            >
+          </v-list-tile-avatar>
+
+          <v-list-tile-content>
+            <v-list-tile-title>Panciu Mihai</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+
+      <v-list class="pt-0" dense>
+        <v-divider></v-divider>
+
+        <v-list-tile
+          dark
+          v-for="item in navBarItems"
+          :key="item.title"
+          :to="item.route"
+          active-class="blue lighten-3 black--text"
+        >
+          <v-list-tile-action>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
     <Login v-model="dialog"></Login>
   </nav>
 </template>
@@ -61,10 +95,10 @@ export default {
       drawer: false,
       dialog: false,
       navBarItems: [
-        { title: "Cămine", route: "/camine" },
-        { title: "Utile", route: "/utile" },
-        { title: "Cantină", route: "/cantina" },
-        { title: "Contact", route: "/contact" }
+        { title: "Cămine", icon: "keyboard_arrow_right", route: "/camine" },
+        { title: "Utile", icon: "keyboard_arrow_right", route: "/utile" },
+        { title: "Cantină", icon: "keyboard_arrow_right", route: "/cantina" },
+        { title: "Contact", icon: "keyboard_arrow_right", route: "/contact" }
       ]
     };
   },
