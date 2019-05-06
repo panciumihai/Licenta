@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampusManagement.Persistanc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampusManagement.Business", "CampusManagement.Business\CampusManagement.Business.csproj", "{7D0ACB57-2194-4F70-A49A-51020AF561FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CampusManagement.Api", "CampusManagement.Api\CampusManagement.Api.csproj", "{E15C0167-467D-4B2C-BDD2-F284874E5AF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampusManagement.Api", "CampusManagement.Api\CampusManagement.Api.csproj", "{E15C0167-467D-4B2C-BDD2-F284874E5AF4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

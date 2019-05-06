@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using CampusManagement.Entities;
@@ -11,29 +10,25 @@ namespace CampusManagement.Business.Generics
         where TEntity : Entity
         where TEntityDetails : class
     {
-        private IGenericRepository GenericRepository { get; }
-        private IMapper Mapper { get; }
+        private readonly IGenericRepository _genericRepository;
+        private readonly IMapper _mapper;
 
         public DetailsService(IGenericRepository genericRepository, IMapper mapper)
         {
-            GenericRepository = genericRepository;
-            Mapper = mapper;
+            _genericRepository = genericRepository;
+            _mapper = mapper;
         }
 
-        public Task<TEntityDetails> GetAsync(Guid id)
+        public async Task<TEntityDetails> GetAsync(Guid id, params string[] includes)
         {
-            throw new NotImplementedException();
+            var result = await _genericRepository.GetAsync<TEntity>(id, includes);
+            return _mapper.Map<TEntityDetails>(result);
         }
 
-        public async Task<IEnumerable<TEntityDetails>> GetAllAsync()
+        public async Task<IEnumerable<TEntityDetails>> GetAllAsync(params string[] includes)
         {
-            var result = await GenericRepository.GetAllAsync<TEntity>();
-            return Mapper.Map<IEnumerable<TEntityDetails>>(result);
-        }
-
-        public Task<IEnumerable<TEntityDetails>> FindAsync(Expression<Func<TEntityDetails, bool>> expression)
-        {
-            throw new NotImplementedException();
+            var result = await _genericRepository.GetAllAsync<TEntity>(includes);
+            return _mapper.Map<IEnumerable<TEntityDetails>>(result);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using CampusManagement.Business.Models;
+﻿using CampusManagement.Business.Person.Models;
 
 namespace CampusManagement.Business.Student.Models
 {

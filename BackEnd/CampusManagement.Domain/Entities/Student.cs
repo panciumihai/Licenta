@@ -3,22 +3,23 @@ using CampusManagement.Entities;
 
 namespace CampusManagement.Domain.Entities
 {
-    public class Student : Person
+    public class Student : Entity
     {
         public short Year { get; private set; }
 
-        public static Student Create(string firstName, string lastName,
-            string email, string pass, string group, short year)
-        {
-            var student = (Student)Create(firstName, lastName,
-                email, pass);
-            student.Year = year;
-            return student;
-        }
+        public Guid PersonId { get; private set; }
+        public Person Person { get; private set; }
 
-        public void SetDefaults()
+        public static Student Create(Person person, short year)
         {
-            Id = Guid.NewGuid();
+            var student = new Student
+            {
+                Person = person,
+                PersonId = person.Id,
+                Year = year
+            };
+
+            return student;
         }
     }
 }

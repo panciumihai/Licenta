@@ -1,0 +1,17 @@
+﻿using CampusManagement.Business.Person.Models;
+using FluentValidation;
+
+namespace CampusManagement.Business.Person.Validations
+{
+    public class PersonCreateModelValidator : AbstractValidator<PersonCreateModel>
+    {
+        public PersonCreateModelValidator()
+        {
+            RuleFor(s => s.LastName).NotEmpty().Length(2, 20).Matches(@"^[A-Za-z]+$");
+            RuleFor(s => s.FirstName).NotEmpty().Length(2, 20).Matches(@"^[A-Za-z]+$");
+            RuleFor(s => s.Email).NotEmpty().EmailAddress().
+                WithMessage(m => $"{m.FirstName} {m.LastName} has wrong Email format ({m.Email}).");
+            RuleFor(s => s.Password).NotEmpty().MinimumLength(6);
+        }
+    }
+}

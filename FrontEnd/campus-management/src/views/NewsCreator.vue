@@ -2,7 +2,8 @@
   <div id="pageEditor">
     <v-container>
       <v-card>
-        <v-card-title class="title mb-1">Scrieti anuntul dorit</v-card-title>
+        <v-card-title class="title mb-1
+        ">Scrieti anuntul dorit</v-card-title>
         <v-card-text class="mt-0">
           <v-layout column wrap>
             <v-flex>

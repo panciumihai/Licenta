@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace CampusManagement.Business.Generics
 {
     public interface IDetailsService<TEntityDetails> where TEntityDetails : class
     {
-        Task<TEntityDetails> GetAsync(Guid id);
-        Task<IEnumerable<TEntityDetails>> GetAllAsync();
-        Task<IEnumerable<TEntityDetails>> FindAsync(Expression<Func<TEntityDetails, bool>> expression);
+        Task<TEntityDetails> GetAsync(Guid id, params string[] includes);
+        Task<IEnumerable<TEntityDetails>> GetAllAsync(params string[] includes);
     }
 }

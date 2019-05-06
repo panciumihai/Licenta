@@ -1,71 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using CampusManagement.Business.Generics;
-using CampusManagement.Business.Student;
+using CampusManagement.Business.Security;
 using CampusManagement.Business.Student.Models;
+using CampusManagement.Domain.Entities;
 
-namespace CampusManagement.Business
+namespace CampusManagement.Business.Student
 {
     public class StudentService : 
         IStudentService
     {
-        private IGenericRepository GenericRepository { get; }
-        private IMapper Mapper { get; }
-        private DetailsService<Domain.Entities.Student, StudentDetailsModel> DetailsService { get; }
-        private CreateService<Domain.Entities.Student, StudentCreateModel> CreateService { get; }
+        private readonly IGenericRepository _genericRepository;
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly IMapper _mapper;
 
-        public StudentService(IGenericRepository genericRepository, IMapper mapper)
-          //  :base(genericRepository, mapper)
+        private readonly DetailsService<Domain.Entities.Student, StudentDetailsModel> _detailsService;
+        private readonly CreateService<Domain.Entities.Student, StudentCreateModel> _createService;
+
+        public StudentService(IGenericRepository genericRepository, IMapper mapper, IPasswordHasher passwordHasher)
         {
-            GenericRepository = genericRepository;
-            Mapper = mapper;
-            DetailsService = new DetailsService<Domain.Entities.Student, StudentDetailsModel>
+            _genericRepository = genericRepository;
+            _mapper = mapper;
+            _passwordHasher = passwordHasher;
+
+            _detailsService = new DetailsService<Domain.Entities.Student, StudentDetailsModel>
                 (genericRepository, mapper);
-            CreateService = new CreateService<Domain.Entities.Student, StudentCreateModel>
+            _createService = new CreateService<Domain.Entities.Student, StudentCreateModel>
                 (genericRepository, mapper);
         }
 
-        public async Task<StudentDetailsModel> GetAsync(Guid id)
+        public async Task<StudentDetailsModel> GetAsync(Guid id, params string[] includes)
         {
-            return await DetailsService.GetAsync(id);
+            //var result =
+             //   await _genericRepository.FindAsync<Domain.Entities.Student>(s => s.Available && s.Id == id, "Person");
+            return await _detailsService.GetAsync(id, includes);
         }
 
-        public async Task<IEnumerable<StudentDetailsModel>> GetAllAsync()
+        public async Task<IEnumerable<StudentDetailsModel>> GetAllAsync(params string[] includes)
         {
-            return await DetailsService.GetAllAsync();
-        }
+            var result= await _genericRepository.GetAllAsync<Domain.Entities.Student>(includes);
 
-        public async Task<IEnumerable<StudentDetailsModel>> FindAsync(Expression<Func<StudentDetailsModel, bool>> expression)
-        {
-            return await DetailsService.FindAsync(expression);
+            return _mapper.Map<IEnumerable<StudentDetailsModel>>(result);
+            //return await _detailsService.GetAllAsync(pagination, includes);
         }
 
         public async Task<Guid> AddAsync(StudentCreateModel entity)
         {
-            return await CreateService.AddAsync(entity);
+            var studentRoles = await _genericRepository.GetAllAsync<Role>();
+
+            var studentRolesGuid = studentRoles.Where(r => r.Name == "Student").Select(i=>i.Id).ToList();
+
+            var person = Entities.Person.Create(entity.FirstName, entity.LastName, 
+                entity.Email, entity.Gender, _passwordHasher.HashPassword(entity.Password), studentRolesGuid);
+
+            var student = Domain.Entities.Student.Create(person, entity.Year);
+
+            var result = await _genericRepository.AddAsync(student);
+            await _genericRepository.SaveAsync();
+
+            return result;
         }
 
-        public async Task AddAsync(IEnumerable<StudentCreateModel> entities)
+        public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<StudentCreateModel> entities)
         {
-            await CreateService.AddAsync(entities);
+            return await _createService.AddAsync(entities);
         }
 
-        public async Task UpdateAsync(StudentCreateModel entity)
+        public async Task<Guid> UpdateAsync(Guid id, StudentCreateModel entity)
         {
-            await CreateService.UpdateAsync(entity);
+            return await _createService.UpdateAsync(id, entity);
         }
 
-        public async Task DeleteAsync(StudentCreateModel entity)
+        public async Task DeleteAsync(Guid id)
         {
-            await CreateService.DeleteAsync(entity);
+            await _createService.DeleteAsync(id);
         }
 
-        public async Task DeleteAsync(IEnumerable<StudentCreateModel> entities)
+        public async Task DeleteAsync(IEnumerable<Guid> idList)
         {
-            await CreateService.DeleteAsync(entities);
+            await _createService.DeleteAsync(idList);
         }
     }
 }

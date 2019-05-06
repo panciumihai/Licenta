@@ -1,33 +1,39 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Entities
 {
     public class Person : Entity
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Gender { get; set; }
-        public string Password { get; set; }
+        public string FirstName { get; private set; }
+        public string LastName { get; private set; }
+        public string Email { get; private set; }
+        public string Gender { get; private set; }
+        public string Password { get; private set; }
+
+        public ICollection<PersonRole> PersonRoles { get; set; } = new Collection<PersonRole>();
 
         public static Person Create(string firstName, string lastName,
-            string email, string password) => new Person()
+            string email, string gender, string password, IEnumerable<Guid> rolesGuid)
         {
-            Id = Guid.NewGuid(),
-            FirstName = firstName,
-            LastName = lastName,
-            Email = email,
-            Password = password
+            var person = new Person()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                Gender = gender,
+                Password = password
             };
 
-        public static Person Create(Person person) => new Person()
-        {
-            Id = Guid.NewGuid(),
-            FirstName = person.FirstName,
-            LastName = person.LastName,
-            Email = person.Email,
-            Password = person.Password
-        };
+            foreach (var guid in rolesGuid)
+            {
+                person.PersonRoles.Add(new PersonRole{ RoleId = guid });
+            }
+
+            return person;
+        }
     }
 }

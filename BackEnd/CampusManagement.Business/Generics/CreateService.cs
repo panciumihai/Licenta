@@ -10,46 +10,53 @@ namespace CampusManagement.Business.Generics
         where TEntity : Entity
         where TCreateEntity : class
     {
-        private IGenericRepository GenericRepository { get; }
-        private IMapper Mapper { get; }
+        private readonly IGenericRepository _genericRepository;
+        private readonly IMapper _mapper;
 
         public CreateService(IGenericRepository genericRepository, IMapper mapper)
         {
-            GenericRepository = genericRepository;
-            Mapper = mapper;
+            _genericRepository = genericRepository;
+            _mapper = mapper;
         }
 
 
         public async Task<Guid> AddAsync(TCreateEntity entity)
         {
-            var entityData = Mapper.Map<TEntity>(entity);
-            await GenericRepository.AddAsync(entityData);
-            await GenericRepository.SaveAsync();
+            var entityData = _mapper.Map<TEntity>(entity);
+            await _genericRepository.AddAsync(entityData);
+            await _genericRepository.SaveAsync();
             return entityData.Id;
         }
 
-        public async Task AddAsync(IEnumerable<TCreateEntity> entities)
+        public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<TCreateEntity> entities)
         {
-            var entitiesData = Mapper.Map<TEntity>(entities);
-            await GenericRepository.AddAsync(entitiesData);
-            await GenericRepository.SaveAsync();
+            var entitiesData = _mapper.Map<IEnumerable<TEntity>>(entities);
+            var result = await _genericRepository.AddAsync(entitiesData);
+            await _genericRepository.SaveAsync();
+            return result;
         }
 
-        public async Task UpdateAsync(TCreateEntity entity)
+        public async Task<Guid> UpdateAsync(Guid id, TCreateEntity entity)
         {
-            var entityData = Mapper.Map<TEntity>(entity);
-            await GenericRepository.UpdateAsync(entityData);
-            await GenericRepository.SaveAsync();
+            var entityData = _mapper.Map<TEntity>(entity);
+            entityData.Id = id;
+
+            var result = await _genericRepository.UpdateAsync(entityData);
+
+            await _genericRepository.SaveAsync();
+            return result;
         }
 
-        public async Task DeleteAsync(TCreateEntity entity)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            await _genericRepository.DeleteAsync<TEntity>(id);
+            await _genericRepository.SaveAsync();
         }
 
-        public async Task DeleteAsync(IEnumerable<TCreateEntity> entities)
+        public async Task DeleteAsync(IEnumerable<Guid> ids)
         {
-            throw new NotImplementedException();
+            await _genericRepository.DeleteAsync<TEntity>(ids);
+            await _genericRepository.SaveAsync();
         }
     }
 }

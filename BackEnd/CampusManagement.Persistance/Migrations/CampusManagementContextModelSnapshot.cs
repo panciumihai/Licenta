@@ -19,7 +19,97 @@ namespace CampusManagement.Persistance.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Admin", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Available");
+
+                    b.Property<Guid>("PersonId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Admins");
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Article", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("AdminId");
+
+                    b.Property<bool>("Available");
+
+                    b.Property<string>("Content");
+
+                    b.Property<string>("Image");
+
+                    b.Property<DateTimeOffset>("PostedDateTime");
+
+                    b.Property<string>("Title");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.ToTable("Articles");
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.PersonRole", b =>
+                {
+                    b.Property<Guid>("PersonId");
+
+                    b.Property<Guid>("RoleId");
+
+                    b.Property<bool>("Available");
+
+                    b.Property<Guid>("Id");
+
+                    b.HasKey("PersonId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("PersonRoles");
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Available");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("CampusManagement.Domain.Entities.Student", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Available");
+
+                    b.Property<Guid>("PersonId");
+
+                    b.Property<short>("Year");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("CampusManagement.Entities.Person", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -36,11 +126,46 @@ namespace CampusManagement.Persistance.Migrations
 
                     b.Property<string>("Password");
 
-                    b.Property<short>("Year");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Students");
+                    b.ToTable("Persons");
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Admin", b =>
+                {
+                    b.HasOne("CampusManagement.Entities.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Article", b =>
+                {
+                    b.HasOne("CampusManagement.Domain.Entities.Admin", "Admin")
+                        .WithMany("Articles")
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.PersonRole", b =>
+                {
+                    b.HasOne("CampusManagement.Entities.Person", "Person")
+                        .WithMany("PersonRoles")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("CampusManagement.Domain.Entities.Role", "Role")
+                        .WithMany("PersonRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Student", b =>
+                {
+                    b.HasOne("CampusManagement.Entities.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

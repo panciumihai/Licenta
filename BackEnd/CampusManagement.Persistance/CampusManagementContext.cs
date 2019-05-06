@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using CampusManagement.Business;
+using CampusManagement.Business.Generics;
 using CampusManagement.Domain.Entities;
 using CampusManagement.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -16,25 +17,83 @@ namespace CampusManagement.Persistance
             : base(options)
         {
             Database.Migrate();
-            //Database.EnsureCreated();
         }
 
+        internal DbSet<Person> Persons { get; private set; }
         internal DbSet<Student> Students { get; private set; }
+        internal DbSet<Admin> Admins { get; private set; }
+        internal DbSet<Article> Articles { get; private set; }
+        internal DbSet<Role> Roles { get; private set; }
 
-        public async Task<T> GetAsync<T>(Guid id) where T : Entity
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            return await Set<T>().FirstOrDefaultAsync(t => t.Id == id && t.Available);
+            base.OnModelCreating(builder);
+
+            builder.Entity<PersonRole>().HasKey(pr => new {pr.PersonId, pr.RoleId});
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : Entity
+        private IQueryable<T> SetIncludes<T>(params string[] includes) where T : Entity
         {
-            return await Set<T>().Where(t => t.Available).ToListAsync();
+            var query = Set<T>().AsQueryable();
+
+            if (includes.Length == 0)
+                return query;
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return query;
         }
 
-        public async Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> expression) where T : Entity
+        private IQueryable<T> SetPagination<T>(int pageNumber = 1, int pageSize = int.MaxValue, IQueryable<T> source = null) 
+            where T : Entity
         {
-            return await Set<T>().Where(t=> t.Available).Where(expression).ToListAsync();
+            var query = source ?? Set<T>().AsQueryable();
+
+            if (pageNumber <= 0 || pageSize <= 0)
+            {
+                pageNumber = 1;
+                pageSize = int.MaxValue;
+            }
+
+            return query.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
         }
+
+        private IQueryable<T> SetSort<T>(Func<T, object> predicate, IQueryable<T> source) where T : Entity
+        {
+            return source.OrderBy(predicate).AsQueryable();
+        }
+
+        public async Task<T> GetAsync<T>(Guid id, params string[] includes) where T : Entity
+        {
+            var query = SetIncludes<T>(includes);
+
+            return await query.FirstOrDefaultAsync(t => t.Id == id && t.Available);
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsync<T>(params string[] includes) where T : Entity
+        {
+            var query = SetIncludes<T>(includes);
+
+            query = query.Where(t => t.Available);
+
+           // query = SetSort(predicate, query);
+
+           // query = SetPagination(pagination.PageNumber, pagination.PageSize, query);
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> predicate, params string[] includes) where T : Entity
+        {
+            var query = SetIncludes<T>(includes);
+
+            return await query.Where(t => t.Available).Where(predicate).ToListAsync();
+        }
+        //var query = Set<T>().Where(predicate);
+        //return await includes.Aggregate(query, (current, includeProperty) => current.Include(includeProperty)).ToListAsync();
+        //return await Set<T>().Where(t=> t.Available).Where(typedExpression).ToListAsync();
 
         public async Task<Guid> AddAsync<T>(T entity) where T : Entity
         {
@@ -42,16 +101,21 @@ namespace CampusManagement.Persistance
             return entity.Id;
         }
 
-        public async Task AddAsync<T>(IEnumerable<T> entites) where T : Entity
+        public async Task<IEnumerable<Guid>> AddAsync<T>(IEnumerable<T> entites) where T : Entity
         {
             await Set<T>().AddRangeAsync(entites);
+            return entites.Select(t => t.Id).ToList();
         }
 
-        public async Task UpdateAsync<T>(T entity) where T : Entity
+        public async Task<Guid> UpdateAsync<T>(T entity) where T : Entity
         {
             var exist = await GetAsync<T>(entity.Id);
             if (exist != null)
+            {
                 Entry(exist).CurrentValues.SetValues(entity);
+                return entity.Id;
+            }
+            return Guid.Empty;
         }
 
         public async Task DeleteAsync<T>(Guid id) where T : Entity
