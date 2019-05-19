@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using CampusManagement.Domain.Entities;
+using CampusManagement.Entities;
 
-namespace CampusManagement.Entities
+namespace CampusManagement.Domain.Entities
 {
     public class Person : Entity
     {

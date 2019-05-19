@@ -42,6 +42,19 @@ namespace CampusManagement.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GetByPerson/{id}", Name = "GetStudentByPersonId")]
+        public async Task<IActionResult> GetByPersonId(Guid id)
+        {
+            var result = await _studentService.GetStudentByPersonId(id, "Person");
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
         // POST api/values
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] StudentCreateModel studentCreateModel)

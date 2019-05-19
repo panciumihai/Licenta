@@ -1,20 +1,26 @@
 <template>
   <div class="home">
-    <NewsPreview></NewsPreview>
-    <NewsPreview></NewsPreview>
-    <NewsPreview></NewsPreview>
+    <ArticlePreview v-for="article in articles" :key="article.title" :article="article"></ArticlePreview>
   </div>
 </template>
 
 <script>
-import NewsPreview from "@/components/NewsPreview";
+import ArticlePreview from "@/components/ArticlePreview";
 
 export default {
   components: {
-    NewsPreview
+    ArticlePreview
   },
   data() {
     return {};
+  },
+  computed: {
+    articles() {
+      return this.$store.getters.articles;
+    }
+  },
+  created() {
+    this.$store.dispatch("getArticles");
   }
 };
 </script>

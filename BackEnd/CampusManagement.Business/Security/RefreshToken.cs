@@ -1,4 +1,6 @@
-﻿namespace CampusManagement.Business.Security
+﻿using System;
+
+namespace CampusManagement.Business.Security
 {
     public class RefreshToken : JsonWebToken
     {

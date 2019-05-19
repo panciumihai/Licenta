@@ -42,7 +42,19 @@ namespace CampusManagement.Api.Controllers
             return Ok(result);
         }
 
-        // POST api/values
+        [HttpGet("GetByPerson/{id}", Name = "GetAdminByPersonId")]
+        public async Task<IActionResult> GetByPersonId(Guid id)
+        {
+            var result = await _adminService.GetAdminByPersonId(id, "Person");
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] AdminCreateModel adminCreateModel)
         {
@@ -69,7 +81,6 @@ namespace CampusManagement.Api.Controllers
             return CreatedAtRoute("GetAllAdmins", results);
         }
 
-        // PUT api/values/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(Guid id, [FromBody] AdminCreateModel adminCreateModel)
         {
@@ -86,7 +97,6 @@ namespace CampusManagement.Api.Controllers
             return NoContent();
         }
 
-        // DELETE api/values/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

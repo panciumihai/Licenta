@@ -10,7 +10,7 @@ namespace CampusManagement.Domain.Entities
         public Guid PersonId { get; private set; }
         public Person Person { get; private set; }
 
-        public ICollection<Article> Articles { get; set; } = new Collection<Article>();
+        public ICollection<Article> Articles { get; private set; } = new Collection<Article>();
 
         public static Admin Create(Person person)
         {

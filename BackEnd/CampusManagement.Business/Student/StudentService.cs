@@ -54,7 +54,7 @@ namespace CampusManagement.Business.Student
 
             var studentRolesGuid = studentRoles.Where(r => r.Name == "Student").Select(i=>i.Id).ToList();
 
-            var person = Entities.Person.Create(entity.FirstName, entity.LastName, 
+            var person = Domain.Entities.Person.Create(entity.FirstName, entity.LastName, 
                 entity.Email, entity.Gender, _passwordHasher.HashPassword(entity.Password), studentRolesGuid);
 
             var student = Domain.Entities.Student.Create(person, entity.Year);
@@ -83,6 +83,13 @@ namespace CampusManagement.Business.Student
         public async Task DeleteAsync(IEnumerable<Guid> idList)
         {
             await _createService.DeleteAsync(idList);
+        }
+
+        public async Task<StudentDetailsModel> GetStudentByPersonId(Guid id, params string[] includes)
+        {
+            var result = await _genericRepository.FindAsync<Domain.Entities.Student>(s=>s.PersonId == id, includes);
+
+            return _mapper.Map<StudentDetailsModel>(result.FirstOrDefault());
         }
     }
 }

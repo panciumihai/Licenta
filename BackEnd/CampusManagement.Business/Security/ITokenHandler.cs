@@ -2,7 +2,7 @@
 {
     public interface ITokenHandler
     {
-        AccessToken CreateAccessToken(Entities.Person person);
+        AccessToken CreateAccessToken(Domain.Entities.Person person);
         RefreshToken TakeRefreshToken(string token);
         void RevokeRefreshToken(string token);
     }

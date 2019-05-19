@@ -1,4 +1,6 @@
-﻿using CampusManagement.Business.Admin.Models;
+﻿using System;
+using System.Threading.Tasks;
+using CampusManagement.Business.Admin.Models;
 using CampusManagement.Business.Generics;
 
 namespace CampusManagement.Business.Admin
@@ -7,5 +9,6 @@ namespace CampusManagement.Business.Admin
         IDetailsService<AdminDetailsModel>,
         ICreateService<AdminCreateModel>
     {
+        Task<AdminDetailsModel> GetAdminByPersonId(Guid id, params string[] includes);
     }
 }

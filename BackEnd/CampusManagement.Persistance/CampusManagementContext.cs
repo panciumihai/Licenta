@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using CampusManagement.Business;
 using CampusManagement.Business.Generics;
 using CampusManagement.Domain.Entities;
 using CampusManagement.Entities;
@@ -20,10 +19,15 @@ namespace CampusManagement.Persistance
         }
 
         internal DbSet<Person> Persons { get; private set; }
+        internal DbSet<Role> Roles { get; private set; }
         internal DbSet<Student> Students { get; private set; }
         internal DbSet<Admin> Admins { get; private set; }
+
         internal DbSet<Article> Articles { get; private set; }
-        internal DbSet<Role> Roles { get; private set; }
+        internal DbSet<Application> Applications { get; private set; }
+        internal DbSet<HostelPreference> HostelPreferences { get; private set; }
+        internal DbSet<Hostel> Hostels { get; private set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

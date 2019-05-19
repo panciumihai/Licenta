@@ -35,6 +35,34 @@ namespace CampusManagement.Persistance.Migrations
                     b.ToTable("Admins");
                 });
 
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Application", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("AccommodationRequest");
+
+                    b.Property<bool>("Available");
+
+                    b.Property<bool>("ChildOfTeacher");
+
+                    b.Property<string>("LastYearLocation");
+
+                    b.Property<DateTimeOffset>("PostedDateTime");
+
+                    b.Property<bool>("Scholarship");
+
+                    b.Property<string>("SpecialCases");
+
+                    b.Property<Guid>("StudentId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Applications");
+                });
+
             modelBuilder.Entity("CampusManagement.Domain.Entities.Article", b =>
                 {
                     b.Property<Guid>("Id")
@@ -57,6 +85,72 @@ namespace CampusManagement.Persistance.Migrations
                     b.HasIndex("AdminId");
 
                     b.ToTable("Articles");
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Hostel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Address");
+
+                    b.Property<bool>("Available");
+
+                    b.Property<string>("HostelAdminFullName");
+
+                    b.Property<string>("MapLocation");
+
+                    b.Property<string>("Name");
+
+                    b.Property<int>("TotalCapacity");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Hostels");
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.HostelPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("ApplicationId");
+
+                    b.Property<bool>("Available");
+
+                    b.Property<Guid>("HostelId");
+
+                    b.Property<int>("PreferenceNumber");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId");
+
+                    b.HasIndex("HostelId");
+
+                    b.ToTable("HostelPreferences");
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Person", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Available");
+
+                    b.Property<string>("Email");
+
+                    b.Property<string>("FirstName");
+
+                    b.Property<string>("Gender");
+
+                    b.Property<string>("LastName");
+
+                    b.Property<string>("Password");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Persons");
                 });
 
             modelBuilder.Entity("CampusManagement.Domain.Entities.PersonRole", b =>
@@ -109,33 +203,19 @@ namespace CampusManagement.Persistance.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("CampusManagement.Entities.Person", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Available");
-
-                    b.Property<string>("Email");
-
-                    b.Property<string>("FirstName");
-
-                    b.Property<string>("Gender");
-
-                    b.Property<string>("LastName");
-
-                    b.Property<string>("Password");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Persons");
-                });
-
             modelBuilder.Entity("CampusManagement.Domain.Entities.Admin", b =>
                 {
-                    b.HasOne("CampusManagement.Entities.Person", "Person")
+                    b.HasOne("CampusManagement.Domain.Entities.Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Application", b =>
+                {
+                    b.HasOne("CampusManagement.Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -147,9 +227,22 @@ namespace CampusManagement.Persistance.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("CampusManagement.Domain.Entities.HostelPreference", b =>
+                {
+                    b.HasOne("CampusManagement.Domain.Entities.Application", "Application")
+                        .WithMany("HostelPreferences")
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("CampusManagement.Domain.Entities.Hostel", "Hostel")
+                        .WithMany()
+                        .HasForeignKey("HostelId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("CampusManagement.Domain.Entities.PersonRole", b =>
                 {
-                    b.HasOne("CampusManagement.Entities.Person", "Person")
+                    b.HasOne("CampusManagement.Domain.Entities.Person", "Person")
                         .WithMany("PersonRoles")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -162,7 +255,7 @@ namespace CampusManagement.Persistance.Migrations
 
             modelBuilder.Entity("CampusManagement.Domain.Entities.Student", b =>
                 {
-                    b.HasOne("CampusManagement.Entities.Person", "Person")
+                    b.HasOne("CampusManagement.Domain.Entities.Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade);

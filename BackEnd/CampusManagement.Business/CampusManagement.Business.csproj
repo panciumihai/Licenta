@@ -26,7 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Application\Validators\" />
     <Folder Include="Authentication\Validations\" />
+    <Folder Include="Hostel\Validators\" />
   </ItemGroup>
 
 </Project>

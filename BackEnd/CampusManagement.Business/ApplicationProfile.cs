@@ -1,9 +1,12 @@
-﻿using System;
-using System.Linq.Expressions;
-using CampusManagement.Business.Admin.Models;
+﻿using CampusManagement.Business.Admin.Models;
+using CampusManagement.Business.Application.Models;
 using CampusManagement.Business.Article.Models;
+using CampusManagement.Business.Authentication.Models;
+using CampusManagement.Business.Hostel.Models;
 using CampusManagement.Business.Person.Models;
+using CampusManagement.Business.Security;
 using CampusManagement.Business.Student.Models;
+using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Business
 {
@@ -11,7 +14,13 @@ namespace CampusManagement.Business
     {
         public ApplicationProfile()
         {
-            CreateMap<Entities.Person, PersonDetailsModel>();
+            CreateMap<AccessToken, TokenDetailsModel>()
+                .ForMember(d=>d.AccessToken, opt => opt.MapFrom(s=>s.Token))
+                .ForMember(d=>d.RefreshToken, opt=>opt.MapFrom(s=>s.RefreshToken.Token))
+                .ForMember(d=>d.Expiration, opt=>opt.MapFrom(s=>s.Expiration))
+                .ForMember(d=>d.Person, opt=>opt.MapFrom(s=>s.Person));
+
+            CreateMap<Domain.Entities.Person, PersonDetailsModel>();
 
             CreateMap<Domain.Entities.Student, StudentDetailsModel>()
                 .ForMember(d=>d.FirstName, opt => opt.MapFrom(s=>s.Person.FirstName))
@@ -33,6 +42,19 @@ namespace CampusManagement.Business
                 .ForMember(d => d.AuthorFirstName, opt => opt.MapFrom(s => s.Admin.Person.FirstName))
                 .ForMember(d => d.AuthorLastName, opt => opt.MapFrom(s => s.Admin.Person.LastName));
             CreateMap<ArticleCreateModel, Domain.Entities.Article>();
+
+            CreateMap<Domain.Entities.Application, ApplicationDetailsModel>();
+            CreateMap<ApplicationCreateModel, Domain.Entities.Application>()
+                .ForMember(d => d.HostelPreferences, opt => opt.MapFrom(s => s.HostelPreferences))
+                .AfterMap((s,d)=> d.SetApplicationForHostelPreferences(d.Id));
+
+            CreateMap<Domain.Entities.HostelPreference, HostelPreferenceDetailsModel>();
+            CreateMap<HostelPreferenceCreateModel, Domain.Entities.HostelPreference>();
+
+            CreateMap<Domain.Entities.Hostel, HostelDetailsModel>();
+            CreateMap<HostelCreateModel, Domain.Entities.Hostel>();
+
+            //CreateMap(HostelPreferenceCreateModel, Domain.Entities.HostelPreference);
         }
     }
 }

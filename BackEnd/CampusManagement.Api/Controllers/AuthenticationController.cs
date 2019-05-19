@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using AutoMapper;
 using CampusManagement.Business.Authentication;
 using CampusManagement.Business.Authentication.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,19 @@ namespace CampusManagement.Api.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
+        private readonly IMapper _mapper;
 
-        public AuthenticationController(IAuthenticationService authenticationService)
+        public AuthenticationController(IAuthenticationService authenticationService, IMapper mapper)
         {
             _authenticationService = authenticationService;
+            _mapper = mapper;
+        }
+
+        [HttpGet("{id}", Name = "GetRoles")]
+        public async Task<IActionResult> GetRolesById(Guid id)
+        {
+            var result = await _authenticationService.GetRolesByPersonId(id);
+            return Ok(result);
         }
 
         [HttpPost("Login")]
@@ -30,9 +41,9 @@ namespace CampusManagement.Api.Controllers
                 return BadRequest(response.Message);
             }
 
-            //var accessTokenResource = _mapper.Map<AccessToken, AccessTokenResource>(response.Token);
-            var accessTokenResource = response.Token;
-            return Ok(accessTokenResource);
+            var accessTokenResource = _mapper.Map<TokenDetailsModel>(response.Token);
+            //var accessTokenResource = response.Token;
+            return Created("", accessTokenResource);
         }
 
         [HttpPost("Refresh")]
@@ -50,7 +61,8 @@ namespace CampusManagement.Api.Controllers
             }
 
             //var tokenResource = _mapper.Map<AccessToken, AccessTokenResource>(response.Token);
-            return Ok(response);
+            var accessTokenResource = _mapper.Map<TokenDetailsModel>(response.Token);
+            return Created("", accessTokenResource);
         }
 
         [HttpPost("Revoke")]

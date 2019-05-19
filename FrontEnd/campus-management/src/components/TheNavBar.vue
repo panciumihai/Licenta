@@ -33,15 +33,28 @@
           </v-tab>
         </v-tabs>
 
-        <v-btn flat color="blue" class="ml-3 mr-0" @click="dialog = true">
+        <v-btn
+          v-show="person.id == null"
+          flat
+          color="blue"
+          class="ml-3 mr-0"
+          @click="dialog = true"
+        >
           <span class="mr-2">Autentificare</span>
           <v-icon>meeting_room</v-icon>
           <Login/>
         </v-btn>
+
+        <v-btn v-show="person.id != null" flat color="blue" class="ml-3 mr-0" to="/logout">
+          <span class="mr-2">Deconectare</span>
+          <v-icon>meeting_room</v-icon>
+          <Login/>
+        </v-btn>
+        <!-- 
         <v-btn depressed dark color="blue" :to="`/register`">
           <span class="mr-2">Inscriere</span>
           <v-icon>exit_to_app</v-icon>
-        </v-btn>
+        </v-btn>-->
       </v-toolbar-items>
     </v-toolbar>
     <v-navigation-drawer disable-resize-watcher v-model="drawer" app dark class="blue" width="250">
@@ -54,7 +67,7 @@
           </v-list-tile-avatar>
 
           <v-list-tile-content>
-            <v-list-tile-title>Panciu Mihai</v-list-tile-title>
+            <v-list-tile-title>{{person.firstName}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -105,7 +118,7 @@ export default {
   methods: {
     openLoginDialog: function() {
       // eslint-disable-next-line
-      console.log("click");
+      //console.log("click");
       this.$emit("dialog", true);
     }
   },
@@ -117,6 +130,9 @@ export default {
           return this.$route.path;
       }
       return "/nan";
+    },
+    person() {
+      return this.$store.getters.person;
     }
   }
 };

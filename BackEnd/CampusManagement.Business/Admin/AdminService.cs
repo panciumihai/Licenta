@@ -47,7 +47,7 @@ namespace CampusManagement.Business.Admin
 
             var studentRolesGuid = studentRoles.Where(r => r.Name == "Admin").Select(i => i.Id).ToList();
 
-            var person = Entities.Person.Create(entity.FirstName, entity.LastName,
+            var person = Domain.Entities.Person.Create(entity.FirstName, entity.LastName,
                 entity.Email, entity.Gender, _passwordHasher.HashPassword(entity.Password), studentRolesGuid);
 
             var admin = Domain.Entities.Admin.Create(person);
@@ -76,6 +76,12 @@ namespace CampusManagement.Business.Admin
         public async Task DeleteAsync(IEnumerable<Guid> ids)
         {
             await _createService.DeleteAsync(ids);
+        }
+
+        public async Task<AdminDetailsModel> GetAdminByPersonId(Guid id, params string[] includes)
+        {
+            var result = await _genericRepository.FindAsync<Domain.Entities.Admin>(a => a.PersonId == id, includes);
+            return _mapper.Map<AdminDetailsModel>(result.FirstOrDefault());
         }
     }
 }

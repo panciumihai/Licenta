@@ -4,6 +4,7 @@ namespace CampusManagement.Business.Article.Models
 {
     public class ArticleDetailsModel
     {
+        public Guid Id { get; private set; }
         public string Title { get; private set; }
         public string Content { get; private set; }
         public string Image { get; private set; }

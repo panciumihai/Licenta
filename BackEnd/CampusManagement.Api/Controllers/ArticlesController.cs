@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using CampusManagement.Business.Admin;
 using CampusManagement.Business.Article;
 using CampusManagement.Business.Article.Models;
-using CampusManagement.Business.Student.Models;
+using CampusManagement.Business.File;
+using CampusManagement.Business.Practice_Things;
 using Microsoft.AspNet.OData;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CampusManagement.Api.Controllers
@@ -14,13 +19,16 @@ namespace CampusManagement.Api.Controllers
     public class ArticlesController : ControllerBase
     {
         private readonly IArticleService _articleService;
+        private readonly IAdminService _adminService;
+        private readonly IFileService _fileService;
 
-        public ArticlesController(IArticleService articleService)
+        public ArticlesController(IArticleService articleService, IFileService fileService, IAdminService adminService)
         {
             _articleService = articleService;
+            _fileService = fileService;
+            _adminService = adminService;
         }
 
-        //[Authorize(Roles="Student")]
         [HttpGet(Name = "GetAllArticles")]
         [EnableQuery()]
         public async Task<IActionResult> Get()
@@ -33,7 +41,7 @@ namespace CampusManagement.Api.Controllers
         [HttpGet("{id}", Name = "GetArticleById")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var result = await _articleService.GetAsync(id, "Admin");
+            var result = await _articleService.GetAsync(id, "Admin.Person");
 
             if (result == null)
             {
@@ -44,13 +52,28 @@ namespace CampusManagement.Api.Controllers
         }
 
         // POST api/values
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ArticleCreateModel articleCreateModel)
+        public async Task<IActionResult> Post(
+            [ModelBinder(BinderType = typeof(JsonModelBinder))] ArticleLightCreateModel articleLightCreateModel,
+            IFormFile file)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            var articleCreateModel = new ArticleCreateModel()
+            {
+                Title = articleLightCreateModel.Title,
+                Content = articleLightCreateModel.Content
+            };
+
+            var filePath = await _fileService.SaveOnDisk(file);
+            articleCreateModel.Image = filePath ?? "Uploads/default_article.png";
+            var personId = Guid.Parse(User.Claims.First(c => c.Type == "PersonId").Value);
+            var admin = await _adminService.GetAdminByPersonId(personId);
+            articleCreateModel.AdminId = admin.Id;
 
             var result = await _articleService.AddAsync(articleCreateModel);
 
@@ -102,6 +125,18 @@ namespace CampusManagement.Api.Controllers
         {
             await _articleService.DeleteAsync(ids);
             return NoContent();
+        }
+        
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadFiles(
+            [ModelBinder(BinderType = typeof(JsonModelBinder))] ArticleCreateModel value,
+            IList<IFormFile> files)
+        {
+            // Use serialized json object 'value'
+            // Use uploaded 'files'
+            var result = await _fileService.SaveOnDisk(files);
+
+            return Ok();
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using AutoMapper;
+using CampusManagement.Business.Person.Models;
 using Microsoft.Extensions.Options;
 
 namespace CampusManagement.Business.Security
@@ -14,16 +16,18 @@ namespace CampusManagement.Business.Security
         private readonly TokenOptions _tokenOptions;
         private readonly SigningConfigurations _signingConfigurations;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IMapper _mapper;
 
         public TokenHandler(IOptions<TokenOptions> tokenOptionsSnapshot, 
-            SigningConfigurations signingConfigurations, IPasswordHasher passwordHasher)
+            SigningConfigurations signingConfigurations, IPasswordHasher passwordHasher, IMapper mapper)
         {
             _tokenOptions = tokenOptionsSnapshot.Value;
             _signingConfigurations = signingConfigurations;
             _passwordHasher = passwordHasher;
+            _mapper = mapper;
         }
 
-        public AccessToken CreateAccessToken(Entities.Person person)
+        public AccessToken CreateAccessToken(Domain.Entities.Person person)
         {
             var refreshToken = BuildRefreshToken(person);
             var accessToken = BuildAccessToken(person, refreshToken);
@@ -50,7 +54,7 @@ namespace CampusManagement.Business.Security
             TakeRefreshToken(token);
         }
 
-        private RefreshToken BuildRefreshToken(Entities.Person person)
+        private RefreshToken BuildRefreshToken(Domain.Entities.Person person)
         {
             var refreshToken = new RefreshToken
                 (
@@ -61,7 +65,7 @@ namespace CampusManagement.Business.Security
             return refreshToken;
         }
 
-        private AccessToken BuildAccessToken(Entities.Person person, RefreshToken refreshToken)
+        private AccessToken BuildAccessToken(Domain.Entities.Person person, RefreshToken refreshToken)
         {
             var accessTokenExpiration = DateTime.UtcNow.AddSeconds(_tokenOptions.AccessTokenExpiration);
 
@@ -77,10 +81,11 @@ namespace CampusManagement.Business.Security
             var handler = new JwtSecurityTokenHandler();
             var accessToken = handler.WriteToken(securityToken);
 
-            return new AccessToken(accessToken, accessTokenExpiration.Ticks, refreshToken);
+            return new AccessToken(accessToken, accessTokenExpiration.Ticks, 
+                _mapper.Map<PersonDetailsModel>(person), refreshToken);
         }
 
-        private IEnumerable<Claim> GetClaims(Entities.Person person)
+        private IEnumerable<Claim> GetClaims(Domain.Entities.Person person)
         {
             var claims = new List<Claim>
             {

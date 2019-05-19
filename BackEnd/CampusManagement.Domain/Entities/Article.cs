@@ -14,7 +14,7 @@ namespace CampusManagement.Domain.Entities
         public Guid AdminId { get; private set; }
         public Admin Admin { get; private set; }
 
-        public Article Create(Admin admin, string title, string content, string image) =>
+        public static Article Create(Admin admin, string title, string content, string image) =>
             new Article()
             {
                 Title = title,

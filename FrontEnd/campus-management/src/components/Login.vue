@@ -58,6 +58,7 @@ export default {
   },
   data() {
     return {
+      //show: Boolean,
       passShow: false,
       password: "",
       email: "",
@@ -73,7 +74,17 @@ export default {
   methods: {
     submit() {
       if (this.$refs.form.validate()) {
-        // eslint-disable-next-line
+        this.$store
+          .dispatch("getToken", {
+            email: this.email,
+            password: this.password
+          })
+          /* eslint-disable */
+
+          .then(response => {
+            this.show = false;
+            this.$router.push({ name: "about" });
+          });
         console.log("e bun");
       }
     },
