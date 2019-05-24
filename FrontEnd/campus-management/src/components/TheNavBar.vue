@@ -1,7 +1,7 @@
 <template>
   <nav>
     <v-toolbar clipped-right app class="toolbar">
-      <v-toolbar-side-icon @click="drawer = !drawer" class="blue--text"></v-toolbar-side-icon>
+      <v-toolbar-side-icon v-show="person.id != null" @click="drawer = !drawer" class="blue--text"></v-toolbar-side-icon>
 
       <router-link to="/" tag="button">
         <v-toolbar-title>

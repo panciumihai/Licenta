@@ -9,11 +9,11 @@ namespace CampusManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HostelController : ControllerBase
+    public class HostelsController : ControllerBase
     {
         private readonly IHostelService _hostelService;
 
-        public HostelController(IHostelService hostelService)
+        public HostelsController(IHostelService hostelService)
         {
             _hostelService = hostelService;
         }

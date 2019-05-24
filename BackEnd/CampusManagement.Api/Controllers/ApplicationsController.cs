@@ -4,17 +4,18 @@ using System.Threading.Tasks;
 using CampusManagement.Business.Application;
 using CampusManagement.Business.Application.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CampusManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ApplicationController : ControllerBase
+    public class ApplicationsController : ControllerBase
     {
         private readonly IApplicationService _applicationService;
 
-        public ApplicationController(IApplicationService applicationService)
+        public ApplicationsController(IApplicationService applicationService)
         {
             _applicationService = applicationService;
         }

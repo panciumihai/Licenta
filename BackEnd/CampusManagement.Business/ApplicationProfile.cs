@@ -28,7 +28,15 @@ namespace CampusManagement.Business
                 .ForMember(d => d.Email, opt => opt.MapFrom(s=>s.Person.Email))
                 .ForMember(d => d.Gender, opt => opt.MapFrom(s => s.Person.Gender));
 
-            CreateMap<StudentCreateModel, Domain.Entities.Student>(); //.AfterMap((s, d) => d.SetDefaults());
+            CreateMap<StudentCreateModel, Domain.Entities.Student>();
+/*
+                //.BeforeMap((s, d) => d.Person = Domain.Entities.Person.Create(s.FirstName,s.LastName,s.Email,s.Gender,s.))
+                .ForMember(d => d.Person.FirstName, opt => opt.MapFrom(s => s.FirstName))
+                .ForMember(d => d.Person.LastName, opt => opt.MapFrom(s => s.LastName))
+                .ForMember(d => d.Person.Email, opt => opt.MapFrom(s => s.Email))
+                .ForMember(d => d.Person.Gender, opt => opt.MapFrom(s => s.Gender))
+                .ForMember(d => d.Person.Password, opt => opt.MapFrom(s => s.Password)); //.AfterMap((s, d) => d.SetDefaults());#1#
+*/
 
             CreateMap<Domain.Entities.Admin, AdminDetailsModel>()
                 .ForMember(d => d.FirstName, opt => opt.MapFrom(s => s.Person.FirstName))

@@ -9,6 +9,7 @@ using CampusManagement.Business.Article.Validations;
 using CampusManagement.Business.Authentication;
 using CampusManagement.Business.File;
 using CampusManagement.Business.Hostel;
+using CampusManagement.Business.HostelStatus;
 using CampusManagement.Business.Person;
 using CampusManagement.Business.Person.Models;
 using CampusManagement.Business.Person.Validations;
@@ -61,6 +62,7 @@ namespace CampusManagement.Business
             services.AddScoped<IArticleService, ArticleService>();
             services.AddScoped<IApplicationService, ApplicationService>();
             services.AddScoped<IHostelService, HostelService>();
+            services.AddScoped<IHostelStatusService, HostelStatusService>();
 
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 

@@ -7,8 +7,8 @@ namespace CampusManagement.Business.Person.Validations
     {
         public PersonCreateModelValidator()
         {
-            RuleFor(s => s.LastName).NotEmpty().Length(2, 20).Matches(@"^[A-Za-z]+$");
-            RuleFor(s => s.FirstName).NotEmpty().Length(2, 20).Matches(@"^[A-Za-z]+$");
+            RuleFor(s => s.LastName).NotEmpty().Length(2, 20).Matches(@"^[\s\S-]+$");
+            RuleFor(s => s.FirstName).NotEmpty().Length(2, 20).Matches(@"^[\s\S-]+$");
             RuleFor(s => s.Email).NotEmpty().EmailAddress().
                 WithMessage(m => $"{m.FirstName} {m.LastName} has wrong Email format ({m.Email}).");
             RuleFor(s => s.Password).NotEmpty().MinimumLength(6);

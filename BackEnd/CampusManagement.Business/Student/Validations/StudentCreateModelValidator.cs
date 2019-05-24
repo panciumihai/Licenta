@@ -9,7 +9,7 @@ namespace CampusManagement.Business.Student
         public StudentCreateModelValidator()
         {
             RuleFor(s => s).SetValidator(new PersonCreateModelValidator());
-            RuleFor(s => s.Year).InclusiveBetween((short)1, (short)3);
+            RuleFor(s => s.Year).InclusiveBetween((short)1, (short)5);
         }
     }
 }

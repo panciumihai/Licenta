@@ -57,7 +57,11 @@ namespace CampusManagement.Api
             services.AddOData();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigin",
+                    builder => builder.WithOrigins("http://localhost:6600"));
+            });
 
             services.AddMvcCore(options =>
             {
@@ -92,9 +96,10 @@ namespace CampusManagement.Api
 
             app.UseCors(options =>
                 options
-                    .AllowAnyHeader()
+                    .AllowAnyOrigin()
                     .AllowAnyMethod()
-                    .AllowAnyOrigin());
+                    .AllowAnyHeader()
+                    .AllowCredentials());
 
             app.UseAuthentication();
             app.UseHttpsRedirection();
@@ -109,6 +114,7 @@ namespace CampusManagement.Api
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "CM API V1");
+                
             });
         }
     }

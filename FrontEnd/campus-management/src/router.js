@@ -6,12 +6,25 @@ import Article from "./views/Article.vue";
 import AccommodationRequest from "./views/AccommodationRequest.vue";
 import ArticleCreator from "./views/ArticleCreator.vue";
 import Logout from "./components/Logout.vue";
+import MaleSeatsRegister from "./views/MaleSeatsRegister.vue";
+import FemaleSeatsRegister from "./views/FemaleSeatsRegister.vue";
+
+import goTo from "vuetify/lib/components/Vuetify/goTo";
 
 Vue.use(Router);
 
 export default new Router({
   mode: "history",
   base: process.env.BASE_URL,
+  scrollBehavior: () => {
+    // if (to.hash) {
+    //   scrollTo = to.hash;
+    // } else if (savedPosition) {
+    //   scrollTo = savedPosition.y;
+    // }
+
+    return goTo(0);
+  },
   routes: [
     {
       path: "/",
@@ -72,6 +85,16 @@ export default new Router({
       path: "/logout",
       name: "logout",
       component: Logout
+    },
+    {
+      path: "/maleSeatsRegister",
+      name: "maleSeatsRegister",
+      component: MaleSeatsRegister
+    },
+    {
+      path: "/femaleSeatsRegister",
+      name: "femaleSeatsRegister",
+      component: FemaleSeatsRegister
     }
   ]
 });

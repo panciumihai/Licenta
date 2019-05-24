@@ -9,7 +9,20 @@ import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
 Vue.use(VueAxios, axios);
 
-axios.defaults.baseURL = "http://localhost:6600/api";
+axios.defaults.baseURL = "http://localhost:6600/api/";
+
+function compareHostels(a, b) {
+  const nameA = a.name.toUpperCase();
+  const nameB = b.name.toUpperCase();
+
+  let comparison = 0;
+  if (nameA > nameB) {
+    comparison = 1;
+  } else if (nameA < nameB) {
+    comparison = -1;
+  }
+  return comparison;
+}
 
 export default new Vuex.Store({
   state: {
@@ -20,7 +33,7 @@ export default new Vuex.Store({
     studentDetails: {},
     articles: [],
     currentArticle: {},
-    students: []
+    hostels: []
   },
   mutations: {
     SET_TOKEN: (state, token) => {
@@ -69,15 +82,18 @@ export default new Vuex.Store({
         minute: "numeric"
       });
       state.currentArticle = article;
+    },
+    SET_HOSTELS: (state, hostels) => {
+      state.hostels = hostels.sort(compareHostels);
     }
   },
   /////////////////////////////////////////// ACTIONS ////////////////////////////////////////////
   /* eslint-disable no-console */
   actions: {
-    getToken({ commit }, credentials) {
+    getToken({ commit, dispatch }, credentials) {
       return new Promise((resolve, reject) => {
         axios
-          .post("/Authentication/Login", {
+          .post("Authentication/Login", {
             email: credentials.email,
             password: credentials.password
           })
@@ -86,7 +102,7 @@ export default new Vuex.Store({
 
             commit("SET_TOKEN", token);
             commit("SET_PERSON", token.person);
-
+            dispatch("getPersonRoles");
             //dispatch("retrieveStudentDetails");
 
             resolve(response);
@@ -99,7 +115,7 @@ export default new Vuex.Store({
     },
     refreshToken({ commit, state }) {
       axios
-        .post("/Authentication/Refresh", {
+        .post("Authentication/Refresh", {
           email: state.person.email,
           token: state.token.refreshToken
         })
@@ -119,18 +135,22 @@ export default new Vuex.Store({
     },
     destroyToken({ commit, state }) {
       axios.defaults.headers.common["Authorization"] =
-        "Bearer " + state.accessToken;
+        "Bearer " + state.token.accessToken;
 
       axios
-        .post("/Authentication/Revoke", {
+        .post("Authentication/Revoke", {
           token: state.token.accessToken
         })
         // eslint-disable-next-line
         .then(response => {
-          commit("SET_TOKEN", null);
-          commit("SET_PERSON", null);
-          commit("SET_PERSON_ROLES", null);
-          commit("SET_STUDENT_DETAILS", null);
+          commit("SET_TOKEN", {});
+          commit("SET_PERSON", {});
+          commit("SET_PERSON_ROLES", []);
+          commit("SET_STUDENT_DETAILS", {});
+          commit("SET_ADMIN_DETAILS", {});
+          console.log("sunt la distrugerea tokenului");
+          localStorage.clear();
+          window.localStorage.clear();
 
           //commit("SET_ADMIN_DETAILS", null);
         })
@@ -138,11 +158,14 @@ export default new Vuex.Store({
           console.log(error);
         });
     },
-    getPersonRoles({ commit, state }) {
+    getPersonRoles({ commit, state, getters, dispatch }) {
       axios
-        .get("/Authentication/" + state.person.id)
+        .get("Authentication/" + state.person.id)
         .then(response => {
           commit("SET_PERSON_ROLES", response.data);
+          if (getters.isStudent) dispatch("getStudentDetails");
+
+          if (getters.isAdmin) dispatch("getAdminDetails");
         })
         .catch(error => {
           console.log(error);
@@ -150,7 +173,7 @@ export default new Vuex.Store({
     },
     getStudentDetails({ commit, state }) {
       axios
-        .get("/Students/GetByPerson/" + state.person.id)
+        .get("Students/GetByPerson/" + state.person.id)
         .then(response => {
           commit("SET_STUDENT_DETAILS", response.data);
         })
@@ -160,7 +183,7 @@ export default new Vuex.Store({
     },
     getAdminDetails({ commit, state }) {
       axios
-        .get("/Admins/" + state.person.id)
+        .get("Admins/GetByPerson/" + state.person.id)
         .then(response => {
           commit("SET_ADMIN_DETAILS", response.data);
         })
@@ -168,13 +191,11 @@ export default new Vuex.Store({
           console.log(error);
         });
     },
-    getArticles(context) {
+    getArticles({ commit }) {
       axios
-        .get("/articles")
+        .get("articles")
         .then(response => {
-          //localStorage.clear();
-          //window.localStorage.clear();
-          context.commit("SET_ARTICLES", response.data);
+          commit("SET_ARTICLES", response.data);
         })
         .catch(error => {
           console.log(error);
@@ -182,7 +203,7 @@ export default new Vuex.Store({
     },
     getArticle({ commit }, id) {
       axios
-        .get("/articles/" + id)
+        .get("articles/" + id)
         .then(response => {
           commit("SET_CURRENT_ARTICLE", response.data);
         })
@@ -199,7 +220,7 @@ export default new Vuex.Store({
         "Bearer " + state.token.accessToken;
 
       axios
-        .post("/articles", formData, {
+        .post("articles", formData, {
           headers: {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "multipart/form-data"
@@ -208,6 +229,25 @@ export default new Vuex.Store({
         .catch(error => {
           console.log(error);
         });
+    },
+    getHostels({ commit }) {
+      axios
+        .get("hostels")
+        .then(response => {
+          commit("SET_HOSTELS", response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    addApplication({ state }, application) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+      axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+
+      axios.post("Applications", application).catch(error => {
+        console.log(error);
+      });
     }
   },
   getters: {
@@ -216,7 +256,8 @@ export default new Vuex.Store({
     student: state => state.studentDetails,
     isAdmin: state => state.personRoles.indexOf("Admin") > -1,
     articles: state => state.articles,
-    article: state => state.currentArticle
+    article: state => state.currentArticle,
+    hostels: state => state.hostels
   },
   plugins: [createPersistedState()]
 });

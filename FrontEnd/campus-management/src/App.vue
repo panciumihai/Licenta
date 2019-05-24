@@ -21,6 +21,9 @@ export default {
   },
   components: {
     TheNavBar
+  },
+  mounted() {
+    this.$store.dispatch("getHostels");
   }
 };
 </script>

@@ -57,7 +57,8 @@ namespace CampusManagement.Business.Student
             var person = Domain.Entities.Person.Create(entity.FirstName, entity.LastName, 
                 entity.Email, entity.Gender, _passwordHasher.HashPassword(entity.Password), studentRolesGuid);
 
-            var student = Domain.Entities.Student.Create(person, entity.Year);
+            var student = Domain.Entities.Student.Create(person, entity.Year, entity.Cnp,
+                entity.Nationality,entity.Score,entity.SecondScore);
 
             var result = await _genericRepository.AddAsync(student);
             await _genericRepository.SaveAsync();
@@ -67,7 +68,14 @@ namespace CampusManagement.Business.Student
 
         public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<StudentCreateModel> entities)
         {
-            return await _createService.AddAsync(entities);
+            IEnumerable<Guid> ids = new List<Guid>();
+
+            foreach (var studentCreateModel in entities)
+            {
+                ids.Append(await AddAsync(studentCreateModel));
+            }
+
+            return ids;
         }
 
         public async Task<Guid> UpdateAsync(Guid id, StudentCreateModel entity)

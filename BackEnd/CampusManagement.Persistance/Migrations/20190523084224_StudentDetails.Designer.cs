@@ -4,14 +4,16 @@ using CampusManagement.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CampusManagement.Persistance.Migrations
 {
     [DbContext(typeof(CampusManagementContext))]
-    partial class CampusManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20190523084224_StudentDetails")]
+    partial class StudentDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -192,17 +194,23 @@ namespace CampusManagement.Persistance.Migrations
 
                     b.Property<bool>("Available");
 
+                    b.Property<int>("BeforeLicenseScore");
+
+                    b.Property<int>("BeforeMasterScore");
+
                     b.Property<string>("Cnp");
 
                     b.Property<string>("Nationality");
 
                     b.Property<Guid>("PersonId");
 
-                    b.Property<double>("Score");
-
-                    b.Property<double>("SecondScore");
-
                     b.Property<short>("Year");
+
+                    b.Property<int>("YearOneMasterScore");
+
+                    b.Property<int>("YearOneScore");
+
+                    b.Property<int>("YearTwoScore");
 
                     b.HasKey("Id");
 

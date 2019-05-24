@@ -15,6 +15,7 @@
                 chips
                 label="Lista camine"
                 multiple
+                menu-props="offsetY"
                 @change="adaugaCamin"
               ></v-select>
             </v-flex>
