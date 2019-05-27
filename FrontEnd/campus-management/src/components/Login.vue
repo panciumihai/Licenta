@@ -67,7 +67,8 @@ export default {
         min8: v => v.length >= 8 || "Minim 8 caractere",
         min6: v => v.length >= 3 || "Minim 6 caractere",
         emailMatch: v =>
-          /^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+/.test(v) || "Emailul nu este valid"
+          /^[a-z0-9.-]+@[a-z0-9]+(\.[a-z0-9])+/.test(v) ||
+          "Emailul nu este valid"
       }
     };
   },

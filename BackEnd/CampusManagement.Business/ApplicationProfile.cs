@@ -3,6 +3,7 @@ using CampusManagement.Business.Application.Models;
 using CampusManagement.Business.Article.Models;
 using CampusManagement.Business.Authentication.Models;
 using CampusManagement.Business.Hostel.Models;
+using CampusManagement.Business.HostelStatus.Models;
 using CampusManagement.Business.Person.Models;
 using CampusManagement.Business.Security;
 using CampusManagement.Business.Student.Models;
@@ -51,7 +52,8 @@ namespace CampusManagement.Business
                 .ForMember(d => d.AuthorLastName, opt => opt.MapFrom(s => s.Admin.Person.LastName));
             CreateMap<ArticleCreateModel, Domain.Entities.Article>();
 
-            CreateMap<Domain.Entities.Application, ApplicationDetailsModel>();
+            CreateMap<Domain.Entities.Application, ApplicationDetailsModel>()
+                .AfterMap((s,d)=>d.HostelPreferencesSort());
             CreateMap<ApplicationCreateModel, Domain.Entities.Application>()
                 .ForMember(d => d.HostelPreferences, opt => opt.MapFrom(s => s.HostelPreferences))
                 .AfterMap((s,d)=> d.SetApplicationForHostelPreferences(d.Id));
@@ -61,6 +63,9 @@ namespace CampusManagement.Business
 
             CreateMap<Domain.Entities.Hostel, HostelDetailsModel>();
             CreateMap<HostelCreateModel, Domain.Entities.Hostel>();
+
+            CreateMap<Domain.Entities.HostelStatus, HostelStatusDetailsModel>();
+            CreateMap<HostelStatusCreateModel, Domain.Entities.HostelStatus>();
 
             //CreateMap(HostelPreferenceCreateModel, Domain.Entities.HostelPreference);
         }

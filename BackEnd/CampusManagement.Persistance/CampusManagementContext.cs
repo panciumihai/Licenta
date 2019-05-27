@@ -27,6 +27,8 @@ namespace CampusManagement.Persistance
         internal DbSet<Application> Applications { get; private set; }
         internal DbSet<HostelPreference> HostelPreferences { get; private set; }
         internal DbSet<Hostel> Hostels { get; private set; }
+        internal DbSet<HostelStatus> HostelsStatus { get; private set; }
+        internal DbSet<StudentsGroup> StudentsGroups { get; private set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

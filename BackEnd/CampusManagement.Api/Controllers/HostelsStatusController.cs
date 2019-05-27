@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CampusManagement.Business.HostelStatus;
+using CampusManagement.Business.HostelStatus.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CampusManagement.Api.Controllers
@@ -23,29 +25,51 @@ namespace CampusManagement.Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetHostelStatusById")]
         public async Task<IActionResult> Get(Guid id)
         {
-            await _hostelStatusService.GetAsync(id, "Hostel", "StudentsGroups.Students");
-            return Ok();
+            var result = await _hostelStatusService.GetAsync(id, "Hostel", "StudentsGroups.Students");
+            return Ok(result);
         }
 
-        // POST: api/HostelStatus
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] HostelStatusCreateModel hostelStatusCreateModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _hostelStatusService.AddOrUpdate(hostelStatusCreateModel);
+
+            return CreatedAtRoute("GetHostelStatusById", new { id = result }, result);
         }
 
-        // PUT: api/HostelStatus/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPost("bulk")]
+        public async Task<IActionResult> Post([FromBody] IEnumerable<HostelStatusCreateModel> hostelStatusCreateModels)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var results = await _hostelStatusService.AddAsync(hostelStatusCreateModels);
+
+            return CreatedAtRoute("GetAllHostel", results);
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
+            await _hostelStatusService.DeleteAsync(id);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody] IEnumerable<Guid> ids)
+        {
+            await _hostelStatusService.DeleteAsync(ids);
+            return NoContent();
         }
     }
 }

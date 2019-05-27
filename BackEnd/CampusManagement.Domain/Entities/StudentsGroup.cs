@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using CampusManagement.Entities;
 
 namespace CampusManagement.Domain.Entities
 {
-    public class StudentsGroup
+    public class StudentsGroup : Entity
     {
         public string Gender { get; private set; }
         public string Year { get; private set; }

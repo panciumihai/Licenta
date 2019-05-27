@@ -4,14 +4,16 @@ using CampusManagement.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CampusManagement.Persistance.Migrations
 {
     [DbContext(typeof(CampusManagementContext))]
-    partial class CampusManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20190525064452_HostelsStatus")]
+    partial class HostelsStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,36 +133,6 @@ namespace CampusManagement.Persistance.Migrations
                     b.ToTable("HostelPreferences");
                 });
 
-            modelBuilder.Entity("CampusManagement.Domain.Entities.HostelStatus", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Available");
-
-                    b.Property<DateTimeOffset>("CreatedDateTime");
-
-                    b.Property<int>("FemaleSeats");
-
-                    b.Property<Guid>("HostelId");
-
-                    b.Property<int>("MaleSeats");
-
-                    b.Property<int>("OccupiedFemaleSeats");
-
-                    b.Property<int>("OccupiedMaleSeats");
-
-                    b.Property<int>("ReservedFemaleSeats");
-
-                    b.Property<int>("ReservedMaleSeats");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HostelId");
-
-                    b.ToTable("HostelsStatus");
-                });
-
             modelBuilder.Entity("CampusManagement.Domain.Entities.Person", b =>
                 {
                     b.Property<Guid>("Id")
@@ -232,37 +204,13 @@ namespace CampusManagement.Persistance.Migrations
 
                     b.Property<double>("SecondScore");
 
-                    b.Property<Guid?>("StudentsGroupId");
-
                     b.Property<short>("Year");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PersonId");
 
-                    b.HasIndex("StudentsGroupId");
-
                     b.ToTable("Students");
-                });
-
-            modelBuilder.Entity("CampusManagement.Domain.Entities.StudentsGroup", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Available");
-
-                    b.Property<string>("Gender");
-
-                    b.Property<Guid?>("HostelStatusId");
-
-                    b.Property<string>("Year");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HostelStatusId");
-
-                    b.ToTable("StudentsGroups");
                 });
 
             modelBuilder.Entity("CampusManagement.Domain.Entities.Admin", b =>
@@ -302,14 +250,6 @@ namespace CampusManagement.Persistance.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("CampusManagement.Domain.Entities.HostelStatus", b =>
-                {
-                    b.HasOne("CampusManagement.Domain.Entities.Hostel", "Hostel")
-                        .WithMany()
-                        .HasForeignKey("HostelId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("CampusManagement.Domain.Entities.PersonRole", b =>
                 {
                     b.HasOne("CampusManagement.Domain.Entities.Person", "Person")
@@ -329,17 +269,6 @@ namespace CampusManagement.Persistance.Migrations
                         .WithMany()
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("CampusManagement.Domain.Entities.StudentsGroup")
-                        .WithMany("Students")
-                        .HasForeignKey("StudentsGroupId");
-                });
-
-            modelBuilder.Entity("CampusManagement.Domain.Entities.StudentsGroup", b =>
-                {
-                    b.HasOne("CampusManagement.Domain.Entities.HostelStatus")
-                        .WithMany("StudentsGroups")
-                        .HasForeignKey("HostelStatusId");
                 });
 #pragma warning restore 612, 618
         }

@@ -27,6 +27,14 @@ namespace CampusManagement.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("WithDetails", Name = "GetAllApplicationWithDetails")]
+        public async Task<IActionResult> GetAllWithDetails()
+        {
+            var result = await _applicationService.GetAllAsync("HostelPreferences", "HostelPreferences.Hostel","Student", "Student.Person");
+            return Ok(result);
+        }
+
+
 
         [HttpGet("{id}", Name = "GetApplicationById")]
         public async Task<IActionResult> Get(Guid id)

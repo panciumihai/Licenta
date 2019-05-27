@@ -7,10 +7,10 @@ namespace CampusManagement.Business.HostelStatus.Models
     {
         public Guid HostelId { get; set; }
 
-        public int MaleSeats { get; set; }
-        public int ReservedMaleSeats { get; set; }
+        public int MaleSeats { get; set; } = 0;
+        public int ReservedMaleSeats { get; set; } = 0;
 
-        public int FemaleSeats { get; set; }
-        public int ReservedFemaleSeats { get; set; }
+        public int FemaleSeats { get; set; } = 0;
+        public int ReservedFemaleSeats { get; set; } = 0;
     }
 }

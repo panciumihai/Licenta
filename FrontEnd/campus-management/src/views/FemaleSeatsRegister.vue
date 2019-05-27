@@ -9,7 +9,7 @@
               <v-select
                 v-model="hostelsStatus"
                 :items="hostels"
-                item-value="id"
+                item-value="hostelId"
                 item-text="name"
                 attach
                 chips
@@ -49,7 +49,7 @@
             <v-flex v-show="hostelsStatus.length > 0">
               <div class="title mb-3 mt-2">Locurile pastrate pentru rezerva:</div>
               <v-layout justify-start wrap>
-                <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.id">
+                <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.hostelId">
                   <v-text-field
                     class="mx-3"
                     :label="hostel.name"
@@ -63,7 +63,7 @@
             <v-flex v-show="hostelsStatus.length > 0">
               <div class="title mb-3 mt-2">Locurile finale disponbile:</div>
               <v-layout justify-start wrap>
-                <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.id">
+                <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.hostelId">
                   <v-text-field
                     class="mx-3"
                     :label="hostel.name"
@@ -140,7 +140,7 @@ export default {
     hostels() {
       return this.$store.getters.hostels.map(function(h) {
         return {
-          id: h.id,
+          hostelId: h.id,
           name: h.name,
           totalFemaleSeats: null,
           femaleSeats: null,

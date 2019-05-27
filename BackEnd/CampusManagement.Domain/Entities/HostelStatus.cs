@@ -10,8 +10,6 @@ namespace CampusManagement.Domain.Entities
         public Guid HostelId { get; private set; }
         public Hostel Hostel { get; private set; }
 
-        public int TotalSeats { get; private set; }
-
         public int MaleSeats { get; private set; }
         public int OccupiedMaleSeats { get; private set; }
         public int ReservedMaleSeats { get; private set; }

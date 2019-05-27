@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Business.Application.Models
 {
     public class ApplicationDetailsModel
     {
+        public Guid Id { get; set; }
+
         public bool ChildOfTeacher { get; set; }
 
         public string SpecialCases { get; set; }
@@ -18,5 +21,10 @@ namespace CampusManagement.Business.Application.Models
 
         public Guid StudentId { get; set; }
         public Domain.Entities.Student Student { get; set; }
+
+        public void HostelPreferencesSort()
+        {
+            HostelPreferences = HostelPreferences.OrderBy(o => o.PreferenceNumber).ToList();
+        }
     }
 }

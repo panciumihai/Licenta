@@ -8,6 +8,7 @@ import ArticleCreator from "./views/ArticleCreator.vue";
 import Logout from "./components/Logout.vue";
 import MaleSeatsRegister from "./views/MaleSeatsRegister.vue";
 import FemaleSeatsRegister from "./views/FemaleSeatsRegister.vue";
+import Applications from "./views/Applications.vue";
 
 import goTo from "vuetify/lib/components/Vuetify/goTo";
 
@@ -95,6 +96,11 @@ export default new Router({
       path: "/femaleSeatsRegister",
       name: "femaleSeatsRegister",
       component: FemaleSeatsRegister
+    },
+    {
+      path: "/applications",
+      name: "applications",
+      component: Applications
     }
   ]
 });

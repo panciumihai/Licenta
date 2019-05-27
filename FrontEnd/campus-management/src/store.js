@@ -33,7 +33,8 @@ export default new Vuex.Store({
     studentDetails: {},
     articles: [],
     currentArticle: {},
-    hostels: []
+    hostels: [],
+    applications: []
   },
   mutations: {
     SET_TOKEN: (state, token) => {
@@ -51,6 +52,9 @@ export default new Vuex.Store({
     },
     SET_STUDENT_DETAILS: (state, studentDetails) => {
       state.studentDetails = studentDetails;
+    },
+    SET_STUDENTS: (state, students) => {
+      state.students = students;
     },
     SET_ARTICLES: (state, articles) => {
       articles.forEach(
@@ -85,6 +89,9 @@ export default new Vuex.Store({
     },
     SET_HOSTELS: (state, hostels) => {
       state.hostels = hostels.sort(compareHostels);
+    },
+    SET_APPLICATIONS: (state, applications) => {
+      state.applications = applications;
     }
   },
   /////////////////////////////////////////// ACTIONS ////////////////////////////////////////////
@@ -248,6 +255,52 @@ export default new Vuex.Store({
       axios.post("Applications", application).catch(error => {
         console.log(error);
       });
+    },
+    addOrUpdateHostelStatus({ state }, status) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+      axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+
+      axios.post("HostelsStatus", status).catch(error => {
+        console.log(error);
+      });
+    },
+    addOrUpdateHostelsStatus({ state }, status) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+      axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+
+      axios.post("HostelsStatus/bulk", status).catch(error => {
+        console.log(error);
+      });
+    },
+    getApplications({ state, commit }) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+      axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+
+      axios
+        .get("Applications")
+        .then(response => {
+          commit("SET_APPLICATIONS", response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    getStudents({ state, commit }) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+      axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+
+      axios
+        .get("Students")
+        .then(response => {
+          commit("SET_STUDENTS", response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   },
   getters: {
@@ -257,7 +310,19 @@ export default new Vuex.Store({
     isAdmin: state => state.personRoles.indexOf("Admin") > -1,
     articles: state => state.articles,
     article: state => state.currentArticle,
-    hostels: state => state.hostels
+    students: state => state.students,
+    hostels: state => state.hostels,
+    applications: state => state.applications,
+    indexById: state => entity => {
+      return state[entity].reduce((map, item, index) => {
+        // Store the `index` instead of the `item`
+        map[item.id] = index;
+        return map;
+      }, {});
+    },
+    byId: (state, getters) => (entity, id) => {
+      return state[entity][getters.indexById(entity)[id]];
+    }
   },
   plugins: [createPersistedState()]
 });
