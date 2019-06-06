@@ -16,6 +16,9 @@ namespace CampusManagement.Domain.Entities
         public Guid PersonId { get; private set; }
         public Person Person { get; private set; }
 
+        public Guid? StudentsGroupId { get; private set; }
+        public bool Confirmed { get; private set; } = false;
+
         public static Student Create(Person person, short year, string cnp, string nationality, double score, double secondScore)
         {
             var student = new Student
@@ -32,13 +35,22 @@ namespace CampusManagement.Domain.Entities
             return student;
         }
 
-        public void Update(short year, string cnp, string nationality, double score, double secondScore)
+        public void Update(short year, string cnp, string nationality, double score, double secondScore, 
+            Guid studentsGroupId, bool confirmed)
         {
             Year = year;
             Cnp = cnp;
             Nationality = nationality;
             Score = score;
             SecondScore = secondScore;
+            StudentsGroupId = studentsGroupId;
+            Confirmed = confirmed;
+        }
+
+        public void Confirmation(bool confirmed, Guid studentsGroupId)
+        {
+            Confirmed = confirmed;
+            StudentsGroupId = studentsGroupId;
         }
 
     }

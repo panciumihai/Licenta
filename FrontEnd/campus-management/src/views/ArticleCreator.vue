@@ -1,44 +1,53 @@
 <template>
-  <div id="pageEditor">
-    <v-container>
-      <v-card>
-        <v-card-title class="title mb-1">Scrieti anuntul dorit</v-card-title>
-        <v-card-text class="mt-0">
-          <v-layout column wrap>
-            <v-flex>
-              <v-text-field v-model="article.title" prepend-icon="title" label="Titlu"></v-text-field>
-            </v-flex>
-            <v-flex align-center align-content-center justify-center align-content-space-around>
-              <img :src="article.imageUrl" aspect-ratio="2.75" v-if="article.imageUrl">
-            </v-flex>
-            <v-flex>
-              <v-text-field
-                label="Alege o imagine"
-                @click="pickFile"
-                v-model="article.imageName"
-                prepend-icon="attach_file"
-              ></v-text-field>
-              <input
-                type="file"
-                style="display: none"
-                ref="image"
-                accept="image/*"
-                @change="onFilePicked"
-              >
-            </v-flex>
-            <v-flex>
-              <quill-editor v-model="article.content" :options="config" output="html"></quill-editor>
-            </v-flex>
-            <v-flex>
-              <v-layout justify-center>
-                <v-btn class="mt-3" dark color="blue" @click="addArticle()">Posteaza</v-btn>
-              </v-layout>
-            </v-flex>
-          </v-layout>
-        </v-card-text>
-      </v-card>
-    </v-container>
-  </div>
+  <v-container>
+    <v-card>
+      <v-card-title class="title mb-1">Scrieti anuntul dorit</v-card-title>
+      <v-card-text class="mt-0">
+        <v-layout column wrap>
+          <v-flex>
+            <v-text-field v-model="article.title" prepend-icon="title" label="Titlu"></v-text-field>
+          </v-flex>
+          <v-flex align-center align-content-center justify-center align-content-space-around>
+            <img :src="article.imageUrl" aspect-ratio="2.75" v-if="article.imageUrl">
+          </v-flex>
+          <v-flex>
+            <v-text-field
+              label="Alege o imagine"
+              @click="pickFile"
+              v-model="article.imageName"
+              prepend-icon="attach_file"
+            ></v-text-field>
+            <input
+              type="file"
+              style="display: none"
+              ref="image"
+              accept="image/*"
+              @change="onFilePicked"
+            >
+          </v-flex>
+          <v-flex>
+            <quill-editor v-model="article.content" :options="config" output="html"></quill-editor>
+          </v-flex>
+          <v-flex>
+            <v-layout justify-center>
+              <v-btn class="mt-3" dark color="blue" @click="addArticle()">Posteaza</v-btn>
+            </v-layout>
+          </v-flex>
+        </v-layout>
+      </v-card-text>
+    </v-card>
+    <v-snackbar
+      v-model="snackbar.active"
+      bottom
+      right
+      :timeout="snackbar.timeout"
+      :vertical="snackbar.mode === 'vertical'"
+      :color="snackbar.color"
+    >
+      {{ snackbar.text }}
+      <v-btn color="white" flat @click="snackbar.active = false">Close</v-btn>
+    </v-snackbar>
+  </v-container>
 </template>
 
 <script>
@@ -48,6 +57,15 @@ export default {
     return {
       config: {
         placeholder: "Scrieti articolul dorit"
+      },
+      snackbar: {
+        active: false,
+        y: "top",
+        x: null,
+        mode: "",
+        timeout: 6000,
+        text: "Locurile au fost salvate cu succes!",
+        color: "success"
       },
       article: {
         title: "",
@@ -92,7 +110,18 @@ export default {
       formData.append("file", this.article.imageFile, this.article.imageName);
       formData.append("articleLightCreateModel", rawData);
 
-      this.$store.dispatch("addArticle", formData);
+      this.$store
+        .dispatch("addArticle", formData)
+        .then(
+          (this.snackbar.text = "Articol adaugat cu succes!"),
+          (this.snackbar.color = "success"),
+          (this.snackbar.active = true)
+        )
+        .catch(
+          (this.snackbar.text = "Hopa! Articolul nu a putut fi adaugat!"),
+          (this.snackbar.color = "error"),
+          (this.snackbar.active = true)
+        );
     }
   },
   created: {}

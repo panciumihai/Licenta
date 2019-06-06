@@ -4,14 +4,16 @@ using CampusManagement.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CampusManagement.Persistance.Migrations
 {
     [DbContext(typeof(CampusManagementContext))]
-    partial class CampusManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20190531153731_StudentsGroupHostelStatusId")]
+    partial class StudentsGroupHostelStatusId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,8 +225,6 @@ namespace CampusManagement.Persistance.Migrations
                     b.Property<bool>("Available");
 
                     b.Property<string>("Cnp");
-
-                    b.Property<bool>("Confirmed");
 
                     b.Property<string>("Nationality");
 

@@ -63,7 +63,7 @@ namespace CampusManagement.Business.Admin
             return await _createService.AddAsync(entities);
         }
 
-        public async Task<Guid> UpdateAsync(Guid id, AdminCreateModel entity)
+        public async Task<Guid> UpdateAsync(Guid id, AdminCreateModel entity, params string[] includes)
         {
             return await _createService.UpdateAsync(id, entity);
         }

@@ -4,14 +4,16 @@ using CampusManagement.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CampusManagement.Persistance.Migrations
 {
     [DbContext(typeof(CampusManagementContext))]
-    partial class CampusManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20190530133052_StudentsGroupsSeats")]
+    partial class StudentsGroupsSeats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,8 +226,6 @@ namespace CampusManagement.Persistance.Migrations
 
                     b.Property<string>("Cnp");
 
-                    b.Property<bool>("Confirmed");
-
                     b.Property<string>("Nationality");
 
                     b.Property<Guid>("PersonId");
@@ -256,11 +256,11 @@ namespace CampusManagement.Persistance.Migrations
 
                     b.Property<string>("Gender");
 
-                    b.Property<Guid>("HostelStatusId");
+                    b.Property<Guid?>("HostelStatusId");
 
                     b.Property<int>("Seats");
 
-                    b.Property<int>("Year");
+                    b.Property<string>("Year");
 
                     b.HasKey("Id");
 
@@ -343,8 +343,7 @@ namespace CampusManagement.Persistance.Migrations
                 {
                     b.HasOne("CampusManagement.Domain.Entities.HostelStatus")
                         .WithMany("StudentsGroups")
-                        .HasForeignKey("HostelStatusId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("HostelStatusId");
                 });
 #pragma warning restore 612, 618
         }

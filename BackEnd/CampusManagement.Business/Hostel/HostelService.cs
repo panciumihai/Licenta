@@ -46,7 +46,7 @@ namespace CampusManagement.Business.Hostel
             return await _createService.AddAsync(entities);
         }
 
-        public async Task<Guid> UpdateAsync(Guid id, HostelCreateModel entity)
+        public async Task<Guid> UpdateAsync(Guid id, HostelCreateModel entity, params string[] includes)
         {
             return await _createService.UpdateAsync(id, entity);
         }

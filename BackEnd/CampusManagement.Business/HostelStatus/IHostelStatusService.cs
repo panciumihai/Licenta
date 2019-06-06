@@ -13,6 +13,7 @@ namespace CampusManagement.Business.HostelStatus
         Task<Guid> AddOrUpdate(HostelStatusCreateModel hostelStatusCreateModel);
         Task<IEnumerable<Guid>> AddOrUpdate(IEnumerable<HostelStatusCreateModel> hostelStatusCreateModel);
 
-        Task SeatsDistribution(Guid id);
+        Task<IEnumerable<HostelStatusDetailsModel>> GetSeats();
+        Task<IEnumerable<HostelStatusDetailsModel>> SeatsAllocationPreview();
     }
 }

@@ -113,12 +113,13 @@ namespace CampusManagement.Persistance
             return entites.Select(t => t.Id).ToList();
         }
 
-        public async Task<Guid> UpdateAsync<T>(T entity) where T : Entity
+        public async Task<Guid> UpdateAsync<T>(T entity, params string[] includes) where T : Entity
         {
-            var exist = await GetAsync<T>(entity.Id);
+            var exist = await GetAsync<T>(entity.Id, includes);
             if (exist != null)
             {
                 Entry(exist).CurrentValues.SetValues(entity);
+                
                 return entity.Id;
             }
             return Guid.Empty;

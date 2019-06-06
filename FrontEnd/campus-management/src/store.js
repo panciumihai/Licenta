@@ -10,7 +10,8 @@ Vue.use(Vuex);
 Vue.use(VueAxios, axios);
 
 axios.defaults.baseURL = "http://localhost:6600/api/";
-
+axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+/* eslint-disable no-console */
 function compareHostels(a, b) {
   const nameA = a.name.toUpperCase();
   const nameB = b.name.toUpperCase();
@@ -19,6 +20,16 @@ function compareHostels(a, b) {
   if (nameA > nameB) {
     comparison = 1;
   } else if (nameA < nameB) {
+    comparison = -1;
+  }
+  return comparison;
+}
+
+function compareStudentsGroupsYear(a, b) {
+  let comparison = 0;
+  if (a.year > b.year) {
+    comparison = 1;
+  } else if (a.year < b.year) {
     comparison = -1;
   }
   return comparison;
@@ -34,7 +45,10 @@ export default new Vuex.Store({
     articles: [],
     currentArticle: {},
     hostels: [],
-    applications: []
+    applications: [],
+    distributions: [],
+    hostelsStatus: [],
+    allocationsPreview: []
   },
   mutations: {
     SET_TOKEN: (state, token) => {
@@ -86,16 +100,28 @@ export default new Vuex.Store({
         minute: "numeric"
       });
       state.currentArticle = article;
+      console.log(state.currentArticle);
+    },
+    DELETE_CURRENT_ARTICLE: state => {
+      state.currentArticle = {};
     },
     SET_HOSTELS: (state, hostels) => {
       state.hostels = hostels.sort(compareHostels);
     },
     SET_APPLICATIONS: (state, applications) => {
       state.applications = applications;
+    },
+    SET_DISTRIBUTIONS: (state, distributions) => {
+      state.distributions = distributions;
+    },
+    SET_HOSTELS_STATUS(state, hostelsStatus) {
+      state.hostelsStatus = hostelsStatus;
+    },
+    SET_ALLOCATIONS_PREVIEW(state, allocationsPreview) {
+      state.allocationsPreview = allocationsPreview;
     }
   },
   /////////////////////////////////////////// ACTIONS ////////////////////////////////////////////
-  /* eslint-disable no-console */
   actions: {
     getToken({ commit, dispatch }, credentials) {
       return new Promise((resolve, reject) => {
@@ -209,33 +235,33 @@ export default new Vuex.Store({
         });
     },
     getArticle({ commit }, id) {
+      commit("DELETE_CURRENT_ARTICLE");
       axios
         .get("articles/" + id)
         .then(response => {
           commit("SET_CURRENT_ARTICLE", response.data);
         })
         .catch(error => {
-          //if (error.response.status == 401) {
-          //  dispatch("refreshToken");
-          //}
           console.log(error + " asta e eroarea mea");
-          // console.log(error.response.status);
         });
     },
     addArticle({ state }, formData) {
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + state.token.accessToken;
-
-      axios
-        .post("articles", formData, {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Content-Type": "multipart/form-data"
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      return new Promise((resolve, reject) => {
+        axios
+          .post("articles", formData, {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Content-Type": "multipart/form-data"
+            }
+          })
+          .then(resolve())
+          .catch(error => {
+            console.log(error);
+            reject();
+          });
+      });
     },
     getHostels({ commit }) {
       axios
@@ -251,18 +277,28 @@ export default new Vuex.Store({
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + state.token.accessToken;
       axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
-
-      axios.post("Applications", application).catch(error => {
-        console.log(error);
+      return new Promise((resolve, reject) => {
+        axios
+          .post("Applications", application)
+          .then(resolve())
+          .catch(error => {
+            console.log(error);
+            reject();
+          });
       });
     },
     addOrUpdateHostelStatus({ state }, status) {
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + state.token.accessToken;
       axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
-
-      axios.post("HostelsStatus", status).catch(error => {
-        console.log(error);
+      return new Promise((resolve, reject) => {
+        axios
+          .post("HostelsStatus", status)
+          .then(resolve())
+          .catch(error => {
+            console.log(error);
+            reject();
+          });
       });
     },
     addOrUpdateHostelsStatus({ state }, status) {
@@ -270,15 +306,23 @@ export default new Vuex.Store({
         "Bearer " + state.token.accessToken;
       axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 
-      axios.post("HostelsStatus/bulk", status).catch(error => {
-        console.log(error);
+      return new Promise((resolve, reject) => {
+        axios
+          .post("HostelsStatus/bulk", status)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error);
+          });
       });
     },
     getApplications({ state, commit }) {
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + state.token.accessToken;
-      axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 
+      commit("SET_APPLICATIONS", []);
       axios
         .get("Applications")
         .then(response => {
@@ -301,6 +345,47 @@ export default new Vuex.Store({
         .catch(error => {
           console.log(error);
         });
+    },
+    getDistributions({ state, commit }) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+      commit("SET_DISTRIBUTIONS", []);
+      axios
+        .get("Applications/SeatsDistribution")
+        .then(response => {
+          commit("SET_DISTRIBUTIONS", response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    getHostelsStatusPreview({ state, commit }) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+
+      axios
+        .get("HostelsStatus/Seats")
+        .then(response => {
+          commit("SET_HOSTELS_STATUS", response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    getHostelsStatusAllocationPreview({ state, commit }) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+
+      commit("SET_ALLOCATIONS_PREVIEW", []);
+
+      axios
+        .get("HostelsStatus/SeatsAllocationPreview")
+        .then(response => {
+          commit("SET_ALLOCATIONS_PREVIEW", response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   },
   getters: {
@@ -313,6 +398,17 @@ export default new Vuex.Store({
     students: state => state.students,
     hostels: state => state.hostels,
     applications: state => state.applications,
+    distributions: state => state.distributions,
+    hostelsStatus: state => state.hostelsStatus,
+    allocationsPreview: state => state.allocationsPreview,
+    maleDistributions: state =>
+      state.distributions
+        .filter(d => d.gender == "M")
+        .sort(compareStudentsGroupsYear),
+    femaleDistributions: state =>
+      state.distributions
+        .filter(d => d.gender == "F")
+        .sort(compareStudentsGroupsYear),
     indexById: state => entity => {
       return state[entity].reduce((map, item, index) => {
         // Store the `index` instead of the `item`

@@ -36,12 +36,12 @@ namespace CampusManagement.Business.Generics
             return result;
         }
 
-        public async Task<Guid> UpdateAsync(Guid id, TCreateEntity entity)
+        public async Task<Guid> UpdateAsync(Guid id, TCreateEntity entity, params string[] includes)
         {
             var entityData = _mapper.Map<TEntity>(entity);
             entityData.Id = id;
 
-            var result = await _genericRepository.UpdateAsync(entityData);
+            var result = await _genericRepository.UpdateAsync(entityData, includes);
 
             await _genericRepository.SaveAsync();
             return result;

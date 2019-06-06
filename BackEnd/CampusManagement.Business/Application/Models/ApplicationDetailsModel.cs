@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CampusManagement.Business.Student.Models;
 using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Business.Application.Models
@@ -16,11 +17,11 @@ namespace CampusManagement.Business.Application.Models
         public bool Scholarship { get; set; }
         public string LastYearLocation { get; set; }
 
-        public ICollection<HostelPreferenceDetailsModel> HostelPreferences { get; set; }
+        public List<HostelPreferenceDetailsModel> HostelPreferences { get; set; }
         public DateTimeOffset PostedDateTime { get; set; }
 
         public Guid StudentId { get; set; }
-        public Domain.Entities.Student Student { get; set; }
+        public StudentDetailsModel Student { get; set; }
 
         public void HostelPreferencesSort()
         {

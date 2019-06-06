@@ -12,5 +12,7 @@ namespace CampusManagement.Business.Student
     {
         //Task<IEnumerable<StudentDetailsModel>> FindAsync(StudentFilterModel filterModel);
         Task<StudentDetailsModel> GetStudentByPersonId(Guid id, params string[] includes);
+
+        Task<Guid> Confirmation(StudentConfirmationModel studentConfirmationModel);
     }
 }

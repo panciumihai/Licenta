@@ -1,5 +1,5 @@
 ﻿using System;
-using CampusManagement.Business.Hostel.Models;
+using System.Collections.Generic;
 
 namespace CampusManagement.Business.HostelStatus.Models
 {
@@ -12,5 +12,7 @@ namespace CampusManagement.Business.HostelStatus.Models
 
         public int FemaleSeats { get; set; } = 0;
         public int ReservedFemaleSeats { get; set; } = 0;
+
+        public ICollection<StudentsGroupCreateModel> StudentsGroups { get; set; } = null;
     }
 }

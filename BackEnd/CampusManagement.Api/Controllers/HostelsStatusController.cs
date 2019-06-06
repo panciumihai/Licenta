@@ -21,7 +21,7 @@ namespace CampusManagement.Api.Controllers
         [HttpGet(Name = "GetAllHostelsStatus")]
         public async Task<IActionResult> Get()
         {
-            var result = await _hostelStatusService.GetAllAsync("Hostel","StudentsGroups.Students");
+            var result = await _hostelStatusService.GetAllAsync("Hostel", "StudentsGroups", "StudentsGroups.Students");
             return Ok(result);
         }
 
@@ -29,6 +29,20 @@ namespace CampusManagement.Api.Controllers
         public async Task<IActionResult> Get(Guid id)
         {
             var result = await _hostelStatusService.GetAsync(id, "Hostel", "StudentsGroups.Students");
+            return Ok(result);
+        }
+
+        [HttpGet("Seats",Name = "GetAllHostelStatusSeats")]
+        public async Task<IActionResult> GetSeats()
+        {
+            var result = await _hostelStatusService.GetSeats();
+            return Ok(result);
+        }
+
+        [HttpGet("SeatsAllocationPreview", Name = "SeatsAllocationPreview")]
+        public async Task<IActionResult> SeatsAllocation()
+        {
+            var result = await _hostelStatusService.SeatsAllocationPreview();
             return Ok(result);
         }
 
@@ -53,7 +67,7 @@ namespace CampusManagement.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var results = await _hostelStatusService.AddAsync(hostelStatusCreateModels);
+            var results = await _hostelStatusService.AddOrUpdate(hostelStatusCreateModels);
 
             return CreatedAtRoute("GetAllHostel", results);
         }

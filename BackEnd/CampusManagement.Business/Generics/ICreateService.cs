@@ -9,7 +9,7 @@ namespace CampusManagement.Business.Generics
         Task<Guid> AddAsync(TCreateEntity entity);
         Task<IEnumerable<Guid>> AddAsync(IEnumerable<TCreateEntity> entities);
 
-        Task<Guid> UpdateAsync(Guid id, TCreateEntity entity);
+        Task<Guid> UpdateAsync(Guid id, TCreateEntity entity, params string[] includes);
 
         Task DeleteAsync(Guid id);
         Task DeleteAsync(IEnumerable<Guid> ids);

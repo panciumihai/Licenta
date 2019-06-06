@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CampusManagement.Business.Application.Models;
 using CampusManagement.Business.Generics;
+using CampusManagement.Business.HostelStatus.Models;
 
 namespace CampusManagement.Business.Application
 {
@@ -9,5 +10,6 @@ namespace CampusManagement.Business.Application
         IDetailsService<ApplicationDetailsModel>,
         ICreateService<ApplicationCreateModel>
     {
+        Task<IEnumerable<StudentsYearDistribution>> SeatsDistribution();
     }
 }

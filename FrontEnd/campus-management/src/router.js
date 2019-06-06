@@ -9,6 +9,10 @@ import Logout from "./components/Logout.vue";
 import MaleSeatsRegister from "./views/MaleSeatsRegister.vue";
 import FemaleSeatsRegister from "./views/FemaleSeatsRegister.vue";
 import Applications from "./views/Applications.vue";
+import FemaleDistribution from "./views/FemaleDistribution.vue";
+import MaleDistribution from "./views/MaleDistribution.vue";
+import HostelsStatusPreview from "./views/HostelsStatusPreview";
+import AllocationsPreview from "./views/AllocationsPreview.vue";
 
 import goTo from "vuetify/lib/components/Vuetify/goTo";
 
@@ -42,8 +46,8 @@ export default new Router({
         import(/* webpackChunkName: "about" */ "./views/About.vue")
     },
     {
-      path: "/camine",
-      name: "camine",
+      path: "/articles",
+      name: "articles",
       component: Home
     },
     {
@@ -73,8 +77,8 @@ export default new Router({
       component: Article
     },
     {
-      path: "/cerereCazare",
-      name: "cerereCazare",
+      path: "/accommodationRequest",
+      name: "accommodationRequest",
       component: AccommodationRequest
     },
     {
@@ -101,6 +105,26 @@ export default new Router({
       path: "/applications",
       name: "applications",
       component: Applications
+    },
+    {
+      path: "/femaleDistribution",
+      name: "femaleDistribution",
+      component: FemaleDistribution
+    },
+    {
+      path: "/maleDistribution",
+      name: "maleDistribution",
+      component: MaleDistribution
+    },
+    {
+      path: "/hostelsStatusPreview",
+      name: "hostelsStatusPreview",
+      component: HostelsStatusPreview
+    },
+    {
+      path: "/allocationsPreview",
+      name: "allocationsPreview",
+      component: AllocationsPreview
     }
   ]
 });

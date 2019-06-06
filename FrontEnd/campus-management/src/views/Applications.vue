@@ -21,13 +21,12 @@
       <v-layout child-flex row wrap>
         <v-data-table
           :headers="headers"
+          :loading="!isLoaded"
           :items="filteredApplications"
-          :loading="loading"
           :search="search"
           v-bind:pagination.sync="pagination"
           class="elevation-1"
         >
-          <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
           <template v-slot:items="app">
             <td>{{ app.item.studentName }}</td>
             <td class="text-xs-left">{{ app.item.gender }}</td>
@@ -46,7 +45,7 @@
 export default {
   data() {
     return {
-      loading: false,
+      loading: true,
       years: ["1", "2", "3", "4", "5"],
       genders: ["M", "F"],
       selectedYear: null,
@@ -80,6 +79,10 @@ export default {
     }
   },
   computed: {
+    isLoaded() {
+      if (this.applications.length > 0) return true;
+      return false;
+    },
     filteredApplications() {
       let apps = this.applications;
       if (this.selectedYear != null)

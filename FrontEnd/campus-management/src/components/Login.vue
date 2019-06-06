@@ -31,7 +31,7 @@
             counter
             @click:append="passShow = !passShow"
           ></v-text-field>
-
+          <div v-show="message!=''" class="subheading red--text ml-4">{{message}}</div>
           <v-spacer></v-spacer>
           <v-container fluid>
             <v-layout row align-end justify-space-between r>
@@ -62,6 +62,7 @@ export default {
       passShow: false,
       password: "",
       email: "",
+      message: "",
       rules: {
         required: v => !!v || "Camp obligatoriu",
         min8: v => v.length >= 8 || "Minim 8 caractere",
@@ -75,6 +76,7 @@ export default {
   methods: {
     submit() {
       if (this.$refs.form.validate()) {
+        this.message = "";
         this.$store
           .dispatch("getToken", {
             email: this.email,
@@ -84,7 +86,10 @@ export default {
 
           .then(response => {
             this.show = false;
-            this.$router.push({ name: "about" });
+            this.$router.push({ name: "articles" });
+          })
+          .catch(reject => {
+            this.message = "Email sau parola incorecte!";
           });
         console.log("e bun");
       }

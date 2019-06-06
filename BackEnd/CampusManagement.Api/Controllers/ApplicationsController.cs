@@ -34,6 +34,12 @@ namespace CampusManagement.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("SeatsDistribution", Name = "GetAllSeatsDistribution")]
+        public async Task<IActionResult> GetSeatsDistribution()
+        {
+            var result = await _applicationService.SeatsDistribution();
+            return Ok(result);
+        }
 
 
         [HttpGet("{id}", Name = "GetApplicationById")]

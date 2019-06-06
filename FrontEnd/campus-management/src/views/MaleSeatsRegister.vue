@@ -1,89 +1,93 @@
 <template>
-  <div class="adaugare-locuri">
-    <v-container>
-      <v-card>
-        <v-card-title class="title">Alegeti caminele disponibile pentru BAIETI:</v-card-title>
-        <v-card-text>
-          <v-layout align-space-around justify-start column>
-            <v-flex>
-              <v-select
-                v-model="hostelsStatus"
-                :items="hostels"
-                item-value="hostelId"
-                item-text="name"
-                attach
-                chips
-                label="Lista camine"
-                multiple
-                menu-props="offsetY"
-                return-object
-              ></v-select>
-            </v-flex>
-            <v-flex class="mt-3" v-show="hostelsStatus.length > 0">
-              <div class="title">Introduceti numarul de locuri pentru caminele selectate:</div>
-              <v-layout justify-start wrap>
-                <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.hostelId">
-                  <v-text-field
-                    class="mx-3"
-                    :label="hostel.name"
-                    v-model="hostel.totalMaleSeats"
-                    mask="####"
-                    @keyup="computeHostelSeats(hostel)"
-                  ></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-flex>
-            <v-flex md12 class="mt-3" v-show="hostelsStatus.length > 0">
-              <div class="title">Ajustati procentul de locuri pentru rezerva:</div>
-              <v-layout row align-center>
-                <div class="title pb-4 mr-4 ml-2">0%</div>
-                <v-slider
-                  class="my-5"
-                  v-model="slider"
-                  thumb-label="always"
-                  @change="sliderChanged"
-                ></v-slider>
-                <div class="title pb-4 mr-2 ml-4">100%</div>
-              </v-layout>
-            </v-flex>
-            <v-flex v-show="hostelsStatus.length > 0">
-              <div class="title mb-3 mt-2">Locurile pastrate pentru rezerva:</div>
-              <v-layout justify-start wrap>
-                <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.hostelId">
-                  <v-text-field
-                    class="mx-3"
-                    :label="hostel.name"
-                    v-model="hostel.reservedMaleSeats"
-                    mask="####"
-                    v-on:keyup="reservedMaleSeatsChanged(hostel)"
-                  ></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-flex>
-            <v-flex v-show="hostelsStatus.length > 0">
-              <div class="title mb-3 mt-2">Locurile finale disponbile:</div>
-              <v-layout justify-start wrap>
-                <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.hostelId">
-                  <v-text-field
-                    class="mx-3"
-                    :label="hostel.name"
-                    v-model="hostel.maleSeats"
-                    mask="####"
-                    v-on:keyup="maleSeatsChanged(hostel)"
-                  ></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-flex>
-            <v-flex class="mt-3" v-show="hostelsStatus.length > 0">
-              <v-layout justify-center>
-                <v-btn dark color="blue" @click="addHostelsStatus">Salveaza locuri</v-btn>
-              </v-layout>
-            </v-flex>
-          </v-layout>
-        </v-card-text>
-      </v-card>
-    </v-container>
-  </div>
+  <v-container>
+    <v-card>
+      <v-card-title class="title">Alegeti caminele disponibile pentru BAIETI:</v-card-title>
+      <v-card-text>
+        <v-layout align-space-around justify-start column>
+          <v-flex>
+            <v-select
+              v-model="hostelsStatus"
+              :items="hostels"
+              item-value="hostelId"
+              item-text="name"
+              attach
+              chips
+              label="Lista camine"
+              multiple
+              menu-props="offsetY"
+              return-object
+            ></v-select>
+          </v-flex>
+          <v-flex class="mt-3" v-show="hostelsStatus.length > 0">
+            <div class="title">Introduceti numarul de locuri pentru caminele selectate:</div>
+            <v-layout justify-start wrap>
+              <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.hostelId">
+                <v-text-field
+                  class="mx-3"
+                  :label="hostel.name"
+                  v-model="hostel.totalMaleSeats"
+                  mask="####"
+                  @keyup="computeHostelSeats(hostel)"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-flex>
+          <v-flex md12 class="mt-3" v-show="hostelsStatus.length > 0">
+            <div class="title">Ajustati procentul de locuri pentru rezerva:</div>
+            <v-layout row align-center>
+              <div class="title pb-4 mr-4 ml-2">0%</div>
+              <v-slider class="my-5" v-model="slider" thumb-label="always" @change="sliderChanged"></v-slider>
+              <div class="title pb-4 mr-2 ml-4">100%</div>
+            </v-layout>
+          </v-flex>
+          <v-flex v-show="hostelsStatus.length > 0">
+            <div class="title mb-3 mt-2">Locurile pastrate pentru rezerva:</div>
+            <v-layout justify-start wrap>
+              <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.hostelId">
+                <v-text-field
+                  class="mx-3"
+                  :label="hostel.name"
+                  v-model="hostel.reservedMaleSeats"
+                  mask="####"
+                  v-on:keyup="reservedMaleSeatsChanged(hostel)"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-flex>
+          <v-flex v-show="hostelsStatus.length > 0">
+            <div class="title mb-3 mt-2">Locurile finale disponbile:</div>
+            <v-layout justify-start wrap>
+              <v-flex xs6 sm4 md2 v-for="(hostel) in hostelsStatus" :key="hostel.hostelId">
+                <v-text-field
+                  class="mx-3"
+                  :label="hostel.name"
+                  v-model="hostel.maleSeats"
+                  mask="####"
+                  v-on:keyup="maleSeatsChanged(hostel)"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-flex>
+          <v-flex class="mt-3" v-show="hostelsStatus.length > 0">
+            <v-layout justify-center>
+              <v-btn dark color="blue" @click="addHostelsStatus">Salveaza locuri</v-btn>
+            </v-layout>
+          </v-flex>
+        </v-layout>
+      </v-card-text>
+    </v-card>
+    <v-snackbar
+      v-model="snackbar.active"
+      bottom
+      right
+      :timeout="snackbar.timeout"
+      :vertical="snackbar.mode === 'vertical'"
+      :color="snackbar.color"
+    >
+      {{ snackbar.text }}
+      <v-btn color="white" flat @click="snackbar.active = false">Close</v-btn>
+    </v-snackbar>
+  </v-container>
 </template>
 
 <script>
@@ -92,7 +96,16 @@ export default {
     return {
       selectedHostels: [],
       hostelsStatus: [],
-      slider: 10
+      slider: 10,
+      snackbar: {
+        active: false,
+        y: "top",
+        x: null,
+        mode: "",
+        timeout: 6000,
+        text: "Locurile au fost salvate cu succes!",
+        color: "success"
+      }
     };
   },
   methods: {
@@ -135,7 +148,20 @@ export default {
       hostel.reservedMaleSeats = hostel.totalMaleSeats - hostel.maleSeats;
     },
     addHostelsStatus() {
-      this.$store.dispatch("addOrUpdateHostelsStatus", this.hostelsStatus);
+      this.$store
+        .dispatch("addOrUpdateHostelsStatus", this.hostelsStatus)
+        .then(response => {
+          (this.snackbar.text = "Locurile au fost adaugate cu succes!"),
+            (this.snackbar.color = "success"),
+            (this.snackbar.active = true),
+            console.log(response);
+        })
+        .catch(error => {
+          (this.snackbar.text = "Hopa! Locurile nu au putut fi adaugate!"),
+            (this.snackbar.color = "error"),
+            (this.snackbar.active = true),
+            console.log(error);
+        });
     }
   },
   computed: {

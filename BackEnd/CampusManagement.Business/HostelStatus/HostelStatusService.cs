@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using CampusManagement.Business.Application;
+using CampusManagement.Business.Application.Models;
 using CampusManagement.Business.Generics;
 using CampusManagement.Business.HostelStatus.Models;
+using CampusManagement.Business.Student;
+using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Business.HostelStatus
 {
@@ -12,14 +16,19 @@ namespace CampusManagement.Business.HostelStatus
     {
         private readonly IGenericRepository _genericRepository;
         private readonly IMapper _mapper;
+        private readonly IApplicationService _applicationService;
+        private readonly IStudentService _studentService;
 
         private readonly DetailsService<Domain.Entities.HostelStatus, HostelStatusDetailsModel> _detailsService;
         private readonly CreateService<Domain.Entities.HostelStatus, HostelStatusCreateModel> _createService;
 
-        public HostelStatusService(IGenericRepository genericRepository, IMapper mapper)
+        public HostelStatusService(IGenericRepository genericRepository, IMapper mapper, 
+            IApplicationService applicationService, IStudentService studentService)
         {
             _genericRepository = genericRepository;
             _mapper = mapper;
+            _applicationService = applicationService;
+            _studentService = studentService;
 
             _detailsService = new DetailsService<Domain.Entities.HostelStatus, HostelStatusDetailsModel>
                 (genericRepository, mapper);
@@ -47,7 +56,7 @@ namespace CampusManagement.Business.HostelStatus
             return await _createService.AddAsync(entities);
         }
 
-        public async Task<Guid> UpdateAsync(Guid id, HostelStatusCreateModel entity)
+        public async Task<Guid> UpdateAsync(Guid id, HostelStatusCreateModel entity, params string[] includes)
         {
             return await _createService.UpdateAsync(id, entity);
         }
@@ -64,7 +73,7 @@ namespace CampusManagement.Business.HostelStatus
 
         public async Task<Guid> AddOrUpdate(HostelStatusCreateModel hostelStatusCreateModel)
         {
-            var status = await _genericRepository.GetAllAsync<Domain.Entities.HostelStatus>("Hostel");
+            var status = await _genericRepository.GetAllAsync<Domain.Entities.HostelStatus>("StudentsGroups");
 
             var selectedStatus = status.FirstOrDefault(s => s.HostelId == hostelStatusCreateModel.HostelId);
 
@@ -76,18 +85,46 @@ namespace CampusManagement.Business.HostelStatus
             }
             else
             {
-                if (hostelStatusCreateModel.MaleSeats != 0)
+                if (hostelStatusCreateModel.StudentsGroups == null)
                 {
-                    hostelStatusCreateModel.FemaleSeats = selectedStatus.FemaleSeats;
-                    hostelStatusCreateModel.ReservedFemaleSeats = selectedStatus.ReservedFemaleSeats;
+                    if (hostelStatusCreateModel.MaleSeats != 0)
+                    {
+                        hostelStatusCreateModel.FemaleSeats = selectedStatus.FemaleSeats;
+                        hostelStatusCreateModel.ReservedFemaleSeats = selectedStatus.ReservedFemaleSeats;
+                    }
+                    else
+                    {
+                        hostelStatusCreateModel.MaleSeats = selectedStatus.MaleSeats;
+                        hostelStatusCreateModel.ReservedMaleSeats = selectedStatus.ReservedMaleSeats;
+                    }
                 }
                 else
                 {
-                    hostelStatusCreateModel.MaleSeats = selectedStatus.MaleSeats;
-                    hostelStatusCreateModel.ReservedMaleSeats = selectedStatus.ReservedMaleSeats;
+                    for (int j=0; j< hostelStatusCreateModel.StudentsGroups.Count; j++)
+                    {
+                        var group = StudentsGroup.Create(
+                            selectedStatus.Id,
+                            hostelStatusCreateModel.StudentsGroups.ElementAt(j).Gender,
+                            hostelStatusCreateModel.StudentsGroups.ElementAt(j).Year,
+                            hostelStatusCreateModel.StudentsGroups.ElementAt(j).Seats,
+                            new List<Domain.Entities.Student>());
+
+                        if (hostelStatusCreateModel.StudentsGroups.ElementAt(j).Id == Guid.Empty)
+                        {
+
+                            hostelStatusCreateModel.StudentsGroups.ElementAt(j).Id =
+                                await _genericRepository.AddAsync(group);
+                        }
+                        else
+                        {
+                            group.Id = hostelStatusCreateModel.StudentsGroups.ElementAt(j).Id;
+                            hostelStatusCreateModel.StudentsGroups.ElementAt(j).Id =
+                                await _genericRepository.UpdateAsync(group);
+                        }
+                    }
                 }
 
-                result = await _createService.UpdateAsync(selectedStatus.Id, hostelStatusCreateModel);
+                result = await _createService.UpdateAsync(selectedStatus.Id, hostelStatusCreateModel, "StudentsGroups");
             }
 
             return result;
@@ -103,91 +140,103 @@ namespace CampusManagement.Business.HostelStatus
             return results;
         }
 
-        public async Task SeatsDistribution(Guid id)
+        public async Task<IEnumerable<HostelStatusDetailsModel>> GetSeats()
         {
-            //var hostelStatus = await _genericRepository.GetAsync<Domain.Entities.HostelStatus>(id,"Hostel");
+            var hostelsStatus = await _detailsService.GetAllAsync("StudentsGroups");
 
-            var applications = await _genericRepository.GetAllAsync<Domain.Entities.Application>("Student","Student.Person");
+            var seatsDistributions = await _applicationService.SeatsDistribution();
 
-            var students = await _genericRepository.GetAllAsync<Domain.Entities.Student>("Person");
-
-            IList<StudentsYearDistribution> yearDistributions = new List<StudentsYearDistribution>();
-
-            int totalStudents = 0;
-            int totalApplications = 0;
-
-            var gender = "F";
-            for (int i = 1; i <= 5; ++i)
+            for (int i = 0; i < hostelsStatus.Count(); ++i)
             {
-                var yearDistribution = new StudentsYearDistribution()
+                if (hostelsStatus.ElementAt(i).StudentsGroups.Count > 0) continue;
+
+                foreach (var seatsDistribution in seatsDistributions)
                 {
-                    Gender = gender,
-                    Year = i,
-                    YearStudentsNumber = students.Count(s => s.Year == i && s.Person.Gender == gender),
-                    YearApplicationsNumber = applications.Count(a=>a.Student.Year == i && a.Student.Person.Gender == gender)
-                };
-                totalStudents += yearDistribution.YearStudentsNumber;
-                totalApplications += yearDistribution.YearApplicationsNumber;
+                    int seats;
+                    if (seatsDistribution.Gender == "M")
+                        seats = (int)Math.Round(seatsDistribution.YearPercentageMean * hostelsStatus.ElementAt(i).MaleSeats);
+                    else
+                        seats = (int)Math.Round(seatsDistribution.YearPercentageMean * hostelsStatus.ElementAt(i).FemaleSeats);
 
-                yearDistributions.Add(yearDistribution);
+                    var group = StudentsGroup.Create(hostelsStatus.ElementAt(i).Id
+                        ,seatsDistribution.Gender, seatsDistribution.Year, seats,
+                        new List<Domain.Entities.Student>());
+
+                    group.Id = Guid.Empty;
+
+                    hostelsStatus.ElementAt(i).StudentsGroups.Add(_mapper.Map<StudentsGroupDetailsModel>(group));
+                }
             }
 
-            for (int i = 0; i < 5; ++i)
-            {
-                yearDistributions[i].YearStudentsPercentage = 
-                    (double)yearDistributions[i].YearStudentsNumber / (double)totalStudents;
-
-                yearDistributions[i].YearApplicationsPercentage = 
-                    (double)yearDistributions[i].YearApplicationsNumber / (double)totalApplications;
-
-                yearDistributions[i].YearPercentageMean =
-                    (yearDistributions[i].YearStudentsPercentage + yearDistributions[i].YearApplicationsPercentage) / 2;
-            }
-
-            totalStudents = 0;
-            totalApplications = 0;
-
-            gender = "M";
-            for (int i = 1; i <= 5; ++i)
-            {
-                var yearDistribution = new StudentsYearDistribution()
-                {
-                    Gender = gender,
-                    Year = i,
-                    YearStudentsNumber = students.Count(s => s.Year == i && s.Person.Gender == gender),
-                    YearApplicationsNumber = applications.Count(a => a.Student.Year == i && a.Student.Person.Gender == gender)
-                };
-                totalStudents += yearDistribution.YearStudentsNumber;
-                totalApplications += yearDistribution.YearApplicationsNumber;
-
-                yearDistributions.Add(yearDistribution);
-            }
-
-            for (int i = 5; i < 10; ++i)
-            {
-                yearDistributions[i].YearStudentsPercentage =
-                    (double) yearDistributions[i].YearStudentsNumber / (double) totalStudents;
-
-                yearDistributions[i].YearApplicationsPercentage =
-                    (double) yearDistributions[i].YearApplicationsNumber / (double) totalApplications;
-
-                yearDistributions[i].YearPercentageMean =
-                    (yearDistributions[i].YearStudentsPercentage + yearDistributions[i].YearApplicationsPercentage) / 2;
-            }
-
-            gender = "done";
-
+            return hostelsStatus;
         }
 
-        public IEnumerable<Domain.Entities.Application> SelectApplications(IEnumerable<Domain.Entities.Application> applications, 
+        public async Task<IEnumerable<HostelStatusDetailsModel>> SeatsAllocationPreview()
+        {
+            var hostelsStatus = await _detailsService.GetAllAsync("StudentsGroups");
+
+            var applications = await _applicationService.GetAllAsync("Student", "Student.Person", "HostelPreferences");
+
+            var genders = new[] {"F", "M"};
+            foreach (var gender in genders)
+            {
+                for (int year = 1; year <= 5; ++year)
+                {
+                    var specificApplications = SelectApplications(applications, gender, year).ToList();
+
+
+                    var availableHostels = hostelsStatus.Select(h => h.HostelId).ToList();
+
+                    foreach (var app in specificApplications)
+                    {
+                        app.HostelPreferences.RemoveAll(p => !availableHostels.Contains(p.HostelId));
+
+                        foreach (var preference in app.HostelPreferences)
+                        {
+                            try
+                            {
+                                var group = hostelsStatus.FirstOrDefault(s => s.HostelId == preference.HostelId)
+                                    .StudentsGroups.FirstOrDefault(g => g.Gender == gender && g.Year == year);
+
+                                if (group.Seats <= group.Students.Count)
+                                {
+                                    availableHostels.Remove(preference.HostelId);
+                                    continue;
+                                }
+
+                                app.Student.StudentsGroupId = group.Id;
+
+                                hostelsStatus.FirstOrDefault(s => s.HostelId == preference.HostelId)
+                                    .StudentsGroups.FirstOrDefault(g => g.Gender == gender && g.Year == year && g.Seats > g.Students.Count).Students.Add(app.Student);
+
+                            }
+                            catch (Exception e)
+                            {
+                                app.Student.StudentsGroupId = null;
+                                continue;
+                            }
+
+                            break;
+
+                            //var student = _mapper.Map<Domain.Entities.Student>(app.Student);
+                            //await _genericRepository.UpdateAsync(student);
+                        }
+                        if (app.Student.StudentsGroupId == null)
+                            break;
+                    }
+                }
+            }
+
+            return hostelsStatus;
+        }
+
+        public IOrderedEnumerable<ApplicationDetailsModel> SelectApplications(IEnumerable<ApplicationDetailsModel> applications, 
             string gender, int year)
         {
             var filteredApplications =
-                applications.Where(a => a.Student.Year == year && a.Student.Person.Gender == gender);
+                applications.Where(a => a.Student.Year == year && a.Student.Gender == gender);
 
-            filteredApplications = filteredApplications.OrderByDescending(a=>a.Student.Score).ThenByDescending(a=>a.Student.SecondScore);
-
-            return filteredApplications;
+           return filteredApplications.OrderByDescending(a=>a.Student.Score).ThenByDescending(a=>a.Student.SecondScore);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace CampusManagement.Business.Generics
         Task<Guid> AddAsync<T>(T entity) where T : Entity;
         Task<IEnumerable<Guid>> AddAsync<T>(IEnumerable<T> entites) where T : Entity;
 
-        Task<Guid> UpdateAsync<T>(T entity) where T : Entity;
+        Task<Guid> UpdateAsync<T>(T entity, params string[] includes) where T : Entity;
 
         Task DeleteAsync<T>(Guid id) where T : Entity;
         Task DeleteAsync<T>(IEnumerable<Guid> ids) where T : Entity;

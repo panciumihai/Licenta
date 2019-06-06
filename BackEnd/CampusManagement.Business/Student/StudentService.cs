@@ -78,7 +78,7 @@ namespace CampusManagement.Business.Student
             return ids;
         }
 
-        public async Task<Guid> UpdateAsync(Guid id, StudentCreateModel entity)
+        public async Task<Guid> UpdateAsync(Guid id, StudentCreateModel entity, params string[] includes)
         {
             return await _createService.UpdateAsync(id, entity);
         }
@@ -98,6 +98,19 @@ namespace CampusManagement.Business.Student
             var result = await _genericRepository.FindAsync<Domain.Entities.Student>(s=>s.PersonId == id, includes);
 
             return _mapper.Map<StudentDetailsModel>(result.FirstOrDefault());
+        }
+
+        public async Task<Guid> Confirmation(StudentConfirmationModel studentConfirmationModel)
+        {
+            var student = await _genericRepository.GetAsync<Domain.Entities.Student>(studentConfirmationModel.Id);
+
+
+            student.Confirmation(studentConfirmationModel.Confirmed, studentConfirmationModel.StudentsGroupId);
+
+            var resullt = await _genericRepository.UpdateAsync(student);
+            await _genericRepository.SaveAsync();
+
+            return resullt;
         }
     }
 }

@@ -67,6 +67,9 @@ namespace CampusManagement.Business
             CreateMap<Domain.Entities.HostelStatus, HostelStatusDetailsModel>();
             CreateMap<HostelStatusCreateModel, Domain.Entities.HostelStatus>();
 
+            CreateMap<Domain.Entities.StudentsGroup, StudentsGroupDetailsModel>();
+            CreateMap<StudentsGroupCreateModel, Domain.Entities.StudentsGroup>();
+
             //CreateMap(HostelPreferenceCreateModel, Domain.Entities.HostelPreference);
         }
     }

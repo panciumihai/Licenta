@@ -45,7 +45,14 @@
           <Login/>
         </v-btn>
 
-        <v-btn v-show="person.id != null" flat color="blue" class="ml-3 mr-0" to="/logout">
+        <v-btn
+          v-show="person.id != null"
+          flat
+          color="blue"
+          class="ml-3 mr-0"
+          @click="drawer=false"
+          to="/logout"
+        >
           <span class="mr-2">Deconectare</span>
           <v-icon>meeting_room</v-icon>
           <Login/>
@@ -61,35 +68,60 @@
       <v-list class="pa-1">
         <v-list-tile avatar>
           <v-list-tile-avatar>
-            <img
-              src="https://yt3.ggpht.com/a-/AAuE7mATBPn2Fmw2O1eKHBLGTKT9oCzeEqddNvPxeg=s900-mo-c-c0xffffffff-rj-k-no"
-            >
+            <img src="../assets/user.png" alt>
           </v-list-tile-avatar>
 
           <v-list-tile-content>
-            <v-list-tile-title>{{person.firstName}}</v-list-tile-title>
+            <v-list-tile-title>
+              <div>
+                {{person.firstName}}
+                <div class="text" v-for="role in person.personRoles" :key="role">{{ role +" " }}</div>
+              </div>
+            </v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
 
-      <v-list class="pt-0" dense>
+      <v-list dense>
         <v-divider></v-divider>
+        <div v-for="item in drawerItems" :key="item.title">
+          <v-list-group
+            v-if="item.items != null"
+            v-model="item.active"
+            :prepend-icon="item.action"
+            no-action
+          >
+            <template v-slot:activator>
+              <v-list-tile>
+                <v-list-tile-content>{{ item.title }}</v-list-tile-content>
+              </v-list-tile>
+            </template>
 
-        <v-list-tile
-          dark
-          v-for="item in navBarItems"
-          :key="item.title"
-          :to="item.route"
-          active-class="blue lighten-3 black--text"
-        >
-          <v-list-tile-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-tile-action>
+            <v-list-tile
+              active-class="blue lighten-3 black--text"
+              v-for="subItem in item.items"
+              :key="subItem.title"
+              :to="{ name: subItem.route }"
+            >
+              <v-list-tile-content>
+                <v-list-tile-title>{{ subItem.title }}</v-list-tile-title>
+              </v-list-tile-content>
 
-          <v-list-tile-content>
-            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+              <v-list-tile-action>
+                <v-icon>{{ subItem.action }}</v-icon>
+              </v-list-tile-action>
+            </v-list-tile>
+          </v-list-group>
+
+          <v-list-tile v-else active-class="blue lighten-3 black--text" :to="{ name: item.route }">
+            <v-list-tile-action>
+              <v-icon>{{ item.action }}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </div>
       </v-list>
     </v-navigation-drawer>
     <Login v-model="dialog"></Login>
@@ -108,8 +140,8 @@ export default {
       drawer: false,
       dialog: false,
       navBarItems: [
-        { title: "Cămine", icon: "keyboard_arrow_right", route: "/camine" },
-        { title: "Utile", icon: "keyboard_arrow_right", route: "/utile" },
+        { title: "Articole", icon: "keyboard_arrow_right", route: "/articles" },
+        { title: "Repartizari", icon: "keyboard_arrow_right", route: "/utile" },
         { title: "Cantină", icon: "keyboard_arrow_right", route: "/cantina" },
         { title: "Contact", icon: "keyboard_arrow_right", route: "/contact" }
       ]
@@ -123,7 +155,61 @@ export default {
     }
   },
   computed: {
-    setTab: function() {
+    drawerItems() {
+      let drawerItems = [];
+      if (this.isAdmin)
+        drawerItems = [
+          {
+            title: "Adauga articol",
+            action: "list_alt",
+            route: "articleCreator"
+          },
+          {
+            title: "Cereri de cazare",
+            action: "face",
+            route: "applications"
+          },
+          {
+            title: "Distributie studenti",
+            active: false,
+            action: "accessibility_new",
+            items: [
+              { title: "Distributie fete", route: "femaleDistribution" },
+              { title: "Distributie baieti", route: "maleDistribution" }
+            ]
+          },
+          {
+            title: "Adauga locuri camine",
+            active: false,
+            action: "note_add",
+            items: [
+              { title: "Locuri fete", route: "femaleSeatsRegister" },
+              { title: "Locuri baieti", route: "maleSeatsRegister" }
+            ]
+          },
+          {
+            title: "Repartizeaza locuri",
+            action: "domain",
+            route: "hostelsStatusPreview"
+          },
+          {
+            title: "Repartizare studenti",
+            action: "local_hotel",
+            route: "allocationsPreview"
+          }
+        ];
+      else if (this.isStudent)
+        drawerItems = [
+          {
+            title: "Cerere cazare",
+            action: "domain",
+            route: "accommodationRequest"
+          }
+        ];
+      return drawerItems;
+    },
+
+    setTab() {
       var i;
       for (i = 0; i < this.navBarItems.length; ++i) {
         if (this.$route.path == this.navBarItems[i].route)
@@ -133,6 +219,12 @@ export default {
     },
     person() {
       return this.$store.getters.person;
+    },
+    isStudent() {
+      return this.$store.getters.isStudent;
+    },
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     }
   }
 };

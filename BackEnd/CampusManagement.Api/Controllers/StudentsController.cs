@@ -55,7 +55,20 @@ namespace CampusManagement.Api.Controllers
             return Ok(result);
         }
 
-        // POST api/values
+
+        [HttpPost("Confirmation")]
+        public async Task<IActionResult> PostCofirmation([FromBody] StudentConfirmationModel studentConfirmation)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _studentService.Confirmation(studentConfirmation);
+
+            return CreatedAtRoute("GetStudentById", new { id = result }, result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] StudentCreateModel studentCreateModel)
         {

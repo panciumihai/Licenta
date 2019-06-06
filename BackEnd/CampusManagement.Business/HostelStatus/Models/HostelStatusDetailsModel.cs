@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using CampusManagement.Business.Hostel.Models;
-using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Business.HostelStatus.Models
 {
     public class HostelStatusDetailsModel
     {
+        public Guid Id { get; private set; }
+
         public Guid HostelId { get; private set; }
         public HostelDetailsModel Hostel { get; private set; }
 
@@ -19,7 +20,7 @@ namespace CampusManagement.Business.HostelStatus.Models
         public int ReservedFemaleSeats { get; private set; }
 
 
-        public ICollection<StudentsGroup> StudentsGroups { get; private set; }
+        public ICollection<StudentsGroupDetailsModel> StudentsGroups { get; private set; }
 
         public DateTimeOffset CreatedDateTime { get; private set; }
     }
