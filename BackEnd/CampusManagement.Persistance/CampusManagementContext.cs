@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using CampusManagement.Business.Generics;
 using CampusManagement.Domain.Entities;
-using CampusManagement.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CampusManagement.Persistance
@@ -29,6 +28,7 @@ namespace CampusManagement.Persistance
         internal DbSet<Hostel> Hostels { get; private set; }
         internal DbSet<HostelStatus> HostelsStatus { get; private set; }
         internal DbSet<StudentsGroup> StudentsGroups { get; private set; }
+        internal DbSet<Stage> Stages { get; private set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -95,11 +95,9 @@ namespace CampusManagement.Persistance
         {
             var query = SetIncludes<T>(includes);
 
-            return await query.Where(t => t.Available).Where(predicate).ToListAsync();
+            var result = query.Where(t => t.Available).Where(predicate).ToList();
+            return result;
         }
-        //var query = Set<T>().Where(predicate);
-        //return await includes.Aggregate(query, (current, includeProperty) => current.Include(includeProperty)).ToListAsync();
-        //return await Set<T>().Where(t=> t.Available).Where(typedExpression).ToListAsync();
 
         public async Task<Guid> AddAsync<T>(T entity) where T : Entity
         {
@@ -145,5 +143,6 @@ namespace CampusManagement.Persistance
         {
             await SaveChangesAsync();
         }
+
     }
 }

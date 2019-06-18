@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CampusManagement.Business.HostelStatus;
 using CampusManagement.Business.HostelStatus.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CampusManagement.Api.Controllers
 {
+    //[Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class HostelsStatusController : ControllerBase
@@ -18,6 +20,7 @@ namespace CampusManagement.Api.Controllers
             _hostelStatusService = hostelStatusService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet(Name = "GetAllHostelsStatus")]
         public async Task<IActionResult> Get()
         {
@@ -40,10 +43,25 @@ namespace CampusManagement.Api.Controllers
         }
 
         [HttpGet("SeatsAllocationPreview", Name = "SeatsAllocationPreview")]
-        public async Task<IActionResult> SeatsAllocation()
+        public async Task<IActionResult> SeatsAllocationPreview()
         {
             var result = await _hostelStatusService.SeatsAllocationPreview();
             return Ok(result);
+        }
+
+        [HttpGet("SeatsAllocation", Name = "SeatsAllocation")]
+        public async Task<IActionResult> SeatsAllocation()
+        {
+            var result = await _hostelStatusService.SeatsAllocation();
+            return Ok(result);
+        }
+
+        [HttpPost("Publish")]
+        public async Task<IActionResult> Post()
+        {
+            await _hostelStatusService.PublishSeats();
+
+            return NoContent();
         }
 
         [HttpPost]

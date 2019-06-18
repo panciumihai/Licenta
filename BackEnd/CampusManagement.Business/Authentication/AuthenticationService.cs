@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using CampusManagement.Business.Authentication.Models;
 using CampusManagement.Business.Generics;
-using CampusManagement.Business.Person;
-using CampusManagement.Business.Responses;
+using CampusManagement.Business.Person.Models;
 using CampusManagement.Business.Security;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CampusManagement.Business.Authentication
 {
@@ -13,51 +20,18 @@ namespace CampusManagement.Business.Authentication
     {
         private readonly IGenericRepository _genericRepository;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly ITokenHandler _tokenHandler;
+        private readonly IMapper _mapper;
+        private readonly AppSettings _appSettings;
 
         public AuthenticationService(IGenericRepository genericRepository, 
-            IPasswordHasher passwordHasher, ITokenHandler tokenHandler)
+            IPasswordHasher passwordHasher,IMapper mapper, IOptions<AppSettings> appSettings)
         {
-            _tokenHandler = tokenHandler;
-            _passwordHasher = passwordHasher;
+
             _genericRepository = genericRepository;
-        }
+            _appSettings = appSettings.Value;
+            _passwordHasher = passwordHasher;
+            _mapper = mapper;
 
-        public async Task<TokenResponse> CreateAccessTokenAsync(string email, string password)
-        {
-            //var person = await _personService.FindPersonByEmailAsync(email);
-            var result = await _genericRepository.FindAsync<Domain.Entities.Person>(x => x.Email == email,
-                "PersonRoles.Role");
-            var person = result.FirstOrDefault();
-
-            if (person == null || !_passwordHasher.PasswordMatches(password, person.Password))
-                return new TokenResponse(false, "Invalid email or password!", null);
-
-            var token = _tokenHandler.CreateAccessToken(person);
-
-            return new TokenResponse(true, null, token);
-        }
-
-        public async Task<TokenResponse> RefreshTokenAsync(string refreshToken, string personEmail)
-        {
-            var token = _tokenHandler.TakeRefreshToken(refreshToken);
-
-            if (token == null)
-                return new TokenResponse(false, "Invalid refresh token.", null);
-
-            if(token.IsExpired())
-                return new TokenResponse(false, "Expired refresh token.", null);
-
-            var result = await _genericRepository.FindAsync<Domain.Entities.Person>(x => x.Email == personEmail,
-                "PersonRoles.Role");
-            var person = result.FirstOrDefault();
-
-            if (person == null)
-                return new TokenResponse(false, "Invalid refresh token", null);
-
-            var accesToken = _tokenHandler.CreateAccessToken(person);
-
-            return new TokenResponse(true, null, accesToken);
         }
 
         public async Task<IEnumerable<string>> GetRolesByPersonId(Guid personId)
@@ -70,9 +44,50 @@ namespace CampusManagement.Business.Authentication
             return roles;
         }
 
-        public void RevokeRefreshToken(string refreshToken)
+        public async Task<TokenDetailsModel> Authenticate(string email, string password)
         {
-            _tokenHandler.RevokeRefreshToken(refreshToken);
+            var result = await _genericRepository.FindAsync<Domain.Entities.Person>(x => x.Email == email,
+                "PersonRoles.Role");
+            var person = result.FirstOrDefault();
+
+
+            if (person == null || !_passwordHasher.PasswordMatches(password, person.Password))
+                return null;
+
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, person.Id.ToString())
+            };
+
+            foreach (var personRole in person.PersonRoles)
+            {
+                claims.Add(
+                    new Claim(ClaimTypes.Role, personRole.Role.Name)
+                );
+            }
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var response = tokenHandler.WriteToken(token);
+
+            var tokenDetailsModel = new TokenDetailsModel
+            {
+                AccessToken = response,
+                RefreshToken = null,
+                Person = _mapper.Map<PersonDetailsModel>(person),
+                PersonRoles = person.PersonRoles.Select(r => r.Role.Name)
+            };
+
+            return tokenDetailsModel;
         }
     }
 }

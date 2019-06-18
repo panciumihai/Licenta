@@ -64,7 +64,14 @@
         </v-btn>-->
       </v-toolbar-items>
     </v-toolbar>
-    <v-navigation-drawer disable-resize-watcher v-model="drawer" app dark class="blue" width="250">
+    <v-navigation-drawer
+      disable-resize-watcher
+      v-model="drawer"
+      app
+      dark
+      class="light-blue"
+      width="250"
+    >
       <v-list class="pa-1">
         <v-list-tile avatar>
           <v-list-tile-avatar>
@@ -141,8 +148,12 @@ export default {
       dialog: false,
       navBarItems: [
         { title: "Articole", icon: "keyboard_arrow_right", route: "/articles" },
-        { title: "Repartizari", icon: "keyboard_arrow_right", route: "/utile" },
-        { title: "Cantină", icon: "keyboard_arrow_right", route: "/cantina" },
+        {
+          title: "Repartizari",
+          icon: "keyboard_arrow_right",
+          route: "/publicDistribution"
+        },
+        { title: "Utile", icon: "keyboard_arrow_right", route: "/cantina" },
         { title: "Contact", icon: "keyboard_arrow_right", route: "/contact" }
       ]
     };
@@ -196,6 +207,11 @@ export default {
             title: "Repartizare studenti",
             action: "local_hotel",
             route: "allocationsPreview"
+          },
+          {
+            title: "Locuri confirmate",
+            action: "done",
+            route: "confirmedSeats"
           }
         ];
       else if (this.isStudent)
@@ -204,6 +220,11 @@ export default {
             title: "Cerere cazare",
             action: "domain",
             route: "accommodationRequest"
+          },
+          {
+            title: "Dispozitie de cazare",
+            action: "description",
+            route: "accommodationDisposition"
           }
         ];
       return drawerItems;

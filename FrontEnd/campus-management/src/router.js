@@ -12,7 +12,10 @@ import Applications from "./views/Applications.vue";
 import FemaleDistribution from "./views/FemaleDistribution.vue";
 import MaleDistribution from "./views/MaleDistribution.vue";
 import HostelsStatusPreview from "./views/HostelsStatusPreview";
-import AllocationsPreview from "./views/AllocationsPreview.vue";
+import SeatsDistribution from "./views/SeatsDistribution.vue";
+import ConfirmedSeats from "./views/ConfirmedSeats.vue";
+import PublicDistribution from "./views/PublicDistribution.vue";
+import AccommodationDisposition from "./views/AccommodationDisposition.vue";
 
 import goTo from "vuetify/lib/components/Vuetify/goTo";
 
@@ -124,7 +127,22 @@ export default new Router({
     {
       path: "/allocationsPreview",
       name: "allocationsPreview",
-      component: AllocationsPreview
+      component: SeatsDistribution
+    },
+    {
+      path: "/confirmedSeats",
+      name: "confirmedSeats",
+      component: ConfirmedSeats
+    },
+    {
+      path: "/publicDistribution",
+      name: "publicDistribution",
+      component: PublicDistribution
+    },
+    {
+      path: "/accommodationDisposition",
+      name: "accommodationDisposition",
+      component: AccommodationDisposition
     }
   ]
 });

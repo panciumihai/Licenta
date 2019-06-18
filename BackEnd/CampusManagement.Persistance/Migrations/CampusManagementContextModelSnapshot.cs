@@ -215,6 +215,26 @@ namespace CampusManagement.Persistance.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("CampusManagement.Domain.Entities.Stage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Available");
+
+                    b.Property<string>("Details");
+
+                    b.Property<DateTimeOffset>("EndDate");
+
+                    b.Property<DateTimeOffset>("PostedDate");
+
+                    b.Property<DateTimeOffset>("StartDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Stages");
+                });
+
             modelBuilder.Entity("CampusManagement.Domain.Entities.Student", b =>
                 {
                     b.Property<Guid>("Id")
@@ -334,14 +354,14 @@ namespace CampusManagement.Persistance.Migrations
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("CampusManagement.Domain.Entities.StudentsGroup")
+                    b.HasOne("CampusManagement.Domain.Entities.StudentsGroup", "StudentsGroup")
                         .WithMany("Students")
                         .HasForeignKey("StudentsGroupId");
                 });
 
             modelBuilder.Entity("CampusManagement.Domain.Entities.StudentsGroup", b =>
                 {
-                    b.HasOne("CampusManagement.Domain.Entities.HostelStatus")
+                    b.HasOne("CampusManagement.Domain.Entities.HostelStatus", "HostelStatus")
                         .WithMany("StudentsGroups")
                         .HasForeignKey("HostelStatusId")
                         .OnDelete(DeleteBehavior.Cascade);

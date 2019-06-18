@@ -1,5 +1,4 @@
 ﻿using System;
-using CampusManagement.Entities;
 
 namespace CampusManagement.Domain.Entities
 {
@@ -17,6 +16,8 @@ namespace CampusManagement.Domain.Entities
         public Person Person { get; private set; }
 
         public Guid? StudentsGroupId { get; private set; }
+        public StudentsGroup StudentsGroup { get; private set; }
+
         public bool Confirmed { get; private set; } = false;
 
         public static Student Create(Person person, short year, string cnp, string nationality, double score, double secondScore)
@@ -50,7 +51,10 @@ namespace CampusManagement.Domain.Entities
         public void Confirmation(bool confirmed, Guid studentsGroupId)
         {
             Confirmed = confirmed;
-            StudentsGroupId = studentsGroupId;
+            if (studentsGroupId == Guid.Empty)
+                StudentsGroupId = null;
+            else
+                StudentsGroupId = studentsGroupId;
         }
 
     }

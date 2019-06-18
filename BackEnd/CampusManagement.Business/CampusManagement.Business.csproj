@@ -30,6 +30,7 @@
     <Folder Include="Authentication\Validations\" />
     <Folder Include="HostelStatus\Validations\" />
     <Folder Include="Hostel\Validators\" />
+    <Folder Include="Stage\Validations\" />
   </ItemGroup>
 
 </Project>

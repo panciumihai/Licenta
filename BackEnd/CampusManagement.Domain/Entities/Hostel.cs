@@ -1,6 +1,4 @@
-﻿using CampusManagement.Entities;
-
-namespace CampusManagement.Domain.Entities
+﻿namespace CampusManagement.Domain.Entities
 {
     public class Hostel : Entity
     {

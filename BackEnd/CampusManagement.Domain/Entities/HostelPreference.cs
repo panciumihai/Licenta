@@ -1,5 +1,4 @@
 ﻿using System;
-using CampusManagement.Entities;
 
 namespace CampusManagement.Domain.Entities
 {

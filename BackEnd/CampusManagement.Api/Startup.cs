@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using CampusManagement.Business;
+using CampusManagement.Business.Authentication;
 using CampusManagement.Business.Security;
 using CampusManagement.Domain.Entities;
 using CampusManagement.Persistance;
@@ -33,24 +35,49 @@ namespace CampusManagement.Api
         {
             services.AddBusiness(Configuration).AddPersistance(Configuration);
 
-            services.Configure<TokenOptions>(Configuration.GetSection("TokenOptions"));
-            var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
+            /*            services.Configure<TokenOptions>(Configuration.GetSection("TokenOptions"));
+                        var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
 
-            var signingConfigurations = new SigningConfigurations();
-            services.AddSingleton(signingConfigurations);
+                        var signingConfigurations = new SigningConfigurations();
+                        services.AddSingleton(signingConfigurations);
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(jwtBearerOptions =>
+                        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                            .AddJwtBearer(jwtBearerOptions =>
+                            {
+                                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
+                                {
+                                    ValidateAudience = true,
+                                    ValidateLifetime = true,
+                                    ValidateIssuerSigningKey = true,
+                                    ValidIssuer = tokenOptions.Issuer,
+                                    ValidAudience = tokenOptions.Audience,
+                                    IssuerSigningKey = signingConfigurations.Key,
+                                    ClockSkew = TimeSpan.Zero
+                                };
+                            });*/
+
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
+            // configure jwt authentication
+
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            services.AddAuthentication(x =>
                 {
-                    jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = tokenOptions.Issuer,
-                        ValidAudience = tokenOptions.Audience,
-                        IssuerSigningKey = signingConfigurations.Key,
-                        ClockSkew = TimeSpan.Zero
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
                     };
                 });
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using CampusManagement.Entities;
+using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Business.Generics
 {

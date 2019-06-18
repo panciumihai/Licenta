@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace CampusManagement.Entities
+namespace CampusManagement.Domain.Entities
 {
     public class Entity
     {

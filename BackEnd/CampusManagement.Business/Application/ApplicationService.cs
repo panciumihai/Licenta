@@ -40,7 +40,10 @@ namespace CampusManagement.Business.Application
 
         public async Task<Guid> AddAsync(ApplicationCreateModel entity)
         {
+            var result = await _detailsService.GetAllAsync();
+            var studentApplications = result.Where(a => a.StudentId == entity.StudentId).Select(a=>a.Id);
 
+            await _createService.DeleteAsync(studentApplications);
 
             return await _createService.AddAsync(entity);
         }

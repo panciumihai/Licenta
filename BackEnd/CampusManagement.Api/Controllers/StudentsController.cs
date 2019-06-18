@@ -29,6 +29,24 @@ namespace CampusManagement.Api.Controllers
             return Ok(students);
         }
 
+        [HttpGet("ConfirmedStudents", Name = "GetAllConfirmedStudents")]
+        [EnableQuery()]
+        public async Task<IActionResult> GetAllConfirmed()
+        {
+            var students = await _studentService.GetAllConfirmedAsync("Person");
+
+            return Ok(students);
+        }
+
+        [HttpGet("UnconfirmedStudents", Name = "GetAllUnconfirmedStudents")]
+        [EnableQuery()]
+        public async Task<IActionResult> GetAllUnconfirmed()
+        {
+            var students = await _studentService.GetAllUnconfirmedAsync("Person");
+
+            return Ok(students);
+        }
+
         [HttpGet("{id}",Name = "GetStudentById")]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -55,6 +73,20 @@ namespace CampusManagement.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GetWithHostel/{id}", Name = "GetStudentWithHostelById")]
+        public async Task<IActionResult> GetWithHostel(Guid id)
+        {
+            var result = await _studentService.GetWithHostelById(id, "Person");
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
+
 
         [HttpPost("Confirmation")]
         public async Task<IActionResult> PostCofirmation([FromBody] StudentConfirmationModel studentConfirmation)
@@ -67,6 +99,19 @@ namespace CampusManagement.Api.Controllers
             var result = await _studentService.Confirmation(studentConfirmation);
 
             return CreatedAtRoute("GetStudentById", new { id = result }, result);
+        }
+
+        [HttpPost("SetStudentsGroup")]
+        public async Task<IActionResult> SetStudentsGroup([FromBody] IEnumerable<StudentConfirmationModel> studentConfirmations)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _studentService.SetStudentsGroup(studentConfirmations);
+
+            return CreatedAtRoute("GetAllUnconfirmedStudents", new { id = result }, result);
         }
 
         [HttpPost]

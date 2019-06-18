@@ -14,6 +14,7 @@ using CampusManagement.Business.Person;
 using CampusManagement.Business.Person.Models;
 using CampusManagement.Business.Person.Validations;
 using CampusManagement.Business.Security;
+using CampusManagement.Business.Stage;
 using CampusManagement.Business.Student;
 using CampusManagement.Business.Student.Models;
 using CampusManagement.Business.Validations;
@@ -63,11 +64,12 @@ namespace CampusManagement.Business
             services.AddScoped<IApplicationService, ApplicationService>();
             services.AddScoped<IHostelService, HostelService>();
             services.AddScoped<IHostelStatusService, HostelStatusService>();
+            services.AddScoped<IStageService, StageService>();
 
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
-            services.AddSingleton<ITokenHandler, TokenHandler>();
+         //   services.AddSingleton<ITokenHandler, TokenHandler>();
             services.AddSingleton<IFileService, FileService>();
 
             return services;

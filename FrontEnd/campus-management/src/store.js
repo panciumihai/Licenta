@@ -48,7 +48,17 @@ export default new Vuex.Store({
     applications: [],
     distributions: [],
     hostelsStatus: [],
-    allocationsPreview: []
+    allocationsPreview: [],
+    unconfirmedStudents: [],
+    confirmedStudents: [],
+    loading: false,
+    stage: {},
+    snackbar: {
+      active: false,
+      timeout: 6000,
+      text: "Operatiune efectuata cu succes!",
+      color: "success"
+    }
   },
   mutations: {
     SET_TOKEN: (state, token) => {
@@ -119,11 +129,28 @@ export default new Vuex.Store({
     },
     SET_ALLOCATIONS_PREVIEW(state, allocationsPreview) {
       state.allocationsPreview = allocationsPreview;
+    },
+    SET_UNCONFIRMED_STUDENTS(state, unconfirmedStudents) {
+      state.unconfirmedStudents = unconfirmedStudents;
+    },
+    SET_CONFIRMED_STUDENTS(state, confirmedStudents) {
+      state.confirmedStudents = confirmedStudents;
+    },
+    SET_STAGE(state, stage) {
+      state.stage = stage;
+    },
+    SET_SNACKBAR(state, snackbar) {
+      state.snackbar.text = snackbar.text;
+      state.snackbar.color = snackbar.color;
+      state.snackbar.active = true;
+    },
+    HIDE_SNACKBAR(state) {
+      state.snackbar.active = false;
     }
   },
   /////////////////////////////////////////// ACTIONS ////////////////////////////////////////////
   actions: {
-    getToken({ commit, dispatch }, credentials) {
+    getToken({ commit, dispatch, getters }, credentials) {
       return new Promise((resolve, reject) => {
         axios
           .post("Authentication/Login", {
@@ -135,8 +162,12 @@ export default new Vuex.Store({
 
             commit("SET_TOKEN", token);
             commit("SET_PERSON", token.person);
-            dispatch("getPersonRoles");
+            //dispatch("getPersonRoles");
             //dispatch("retrieveStudentDetails");
+            commit("SET_PERSON_ROLES", token.personRoles);
+            if (getters.isStudent) dispatch("getStudentDetails");
+
+            if (getters.isAdmin) dispatch("getAdminDetails");
 
             resolve(response);
           })
@@ -176,20 +207,19 @@ export default new Vuex.Store({
         })
         // eslint-disable-next-line
         .then(response => {
-          commit("SET_TOKEN", {});
-          commit("SET_PERSON", {});
-          commit("SET_PERSON_ROLES", []);
-          commit("SET_STUDENT_DETAILS", {});
-          commit("SET_ADMIN_DETAILS", {});
           console.log("sunt la distrugerea tokenului");
-          localStorage.clear();
-          window.localStorage.clear();
-
           //commit("SET_ADMIN_DETAILS", null);
         })
         .catch(error => {
           console.log(error);
         });
+      commit("SET_TOKEN", {});
+      commit("SET_PERSON", {});
+      commit("SET_PERSON_ROLES", []);
+      commit("SET_STUDENT_DETAILS", {});
+      commit("SET_ADMIN_DETAILS", {});
+      localStorage.clear();
+      window.localStorage.clear();
     },
     getPersonRoles({ commit, state, getters, dispatch }) {
       axios
@@ -207,6 +237,16 @@ export default new Vuex.Store({
     getStudentDetails({ commit, state }) {
       axios
         .get("Students/GetByPerson/" + state.person.id)
+        .then(response => {
+          commit("SET_STUDENT_DETAILS", response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    getStudentWithHostel({ commit, state }) {
+      axios
+        .get("Students/GetWithHostel/" + state.studentDetails.id)
         .then(response => {
           commit("SET_STUDENT_DETAILS", response.data);
         })
@@ -346,6 +386,20 @@ export default new Vuex.Store({
           console.log(error);
         });
     },
+    addStudentsAllocations({ state }, studentsAllocations) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+
+      return new Promise((resolve, reject) => {
+        axios
+          .post("Students/SetStudentsGroup", studentsAllocations)
+          .then(response => resolve(response))
+          .catch(error => {
+            console.log(error);
+            reject(error);
+          });
+      });
+    },
     getDistributions({ state, commit }) {
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + state.token.accessToken;
@@ -372,6 +426,31 @@ export default new Vuex.Store({
           console.log(error);
         });
     },
+    getHostelsStatusAllocation({ commit }) {
+      //state.loading = true;
+      commit("SET_STAGE", {});
+      axios
+        .get("Stages/Current")
+        .then(response => {
+          commit("SET_STAGE", response.data);
+          //state.loading = false;
+          console.log(response.status);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
+      commit("SET_ALLOCATIONS", []);
+
+      axios
+        .get("HostelsStatus/SeatsAllocation")
+        .then(response => {
+          commit("SET_ALLOCATIONS", response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
     getHostelsStatusAllocationPreview({ state, commit }) {
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + state.token.accessToken;
@@ -386,6 +465,107 @@ export default new Vuex.Store({
         .catch(error => {
           console.log(error);
         });
+    },
+    addStudentConfirmation({ state }, confirmation) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+
+      return new Promise((resolve, reject) => {
+        axios
+          .post("Students/Confirmation", confirmation)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error);
+          });
+      });
+    },
+    getConfirmedStudents({ state, commit }) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+      state.loading = true;
+      axios
+        .get("Students/ConfirmedStudents")
+        .then(response => {
+          commit("SET_CONFIRMED_STUDENTS", response.data);
+          state.loading = false;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    getUnconfirmedStudents({ state, commit }) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+      state.loading = true;
+      axios
+        .get("Students/UnconfirmedStudents")
+        .then(response => {
+          commit("SET_UNCONFIRMED_STUDENTS", response.data);
+          state.loading = false;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    getStage({ state, commit, dispatch }) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+      //state.loading = true;
+      commit("SET_STAGE", {});
+      axios
+        .get("Stages/Current")
+        .then(response => {
+          commit("SET_STAGE", response.data);
+          //state.loading = false;
+          console.log(response.status);
+          if (response.status != 204)
+            dispatch("getHostelsStatusAllocationPreview");
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    addStage({ state }, stage) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+
+      return new Promise((resolve, reject) => {
+        axios
+          .post("Stages", stage)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error);
+          });
+      });
+    },
+    publishSeats({ state }) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+
+      return new Promise((resolve, reject) => {
+        axios
+          .post("HostelsStatus/Publish")
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error);
+          });
+      });
+    },
+
+    showSnackbar({ commit }, snackbar) {
+      commit("SET_SNACKBAR", snackbar);
+    },
+    hideSnackbar({ commit }) {
+      commit("HIDE_SNACKBAR");
     }
   },
   getters: {
@@ -401,6 +581,9 @@ export default new Vuex.Store({
     distributions: state => state.distributions,
     hostelsStatus: state => state.hostelsStatus,
     allocationsPreview: state => state.allocationsPreview,
+    confirmedStudents: state => state.confirmedStudents,
+    unconfirmedStudents: state => state.unconfirmedStudents,
+    stage: state => state.stage,
     maleDistributions: state =>
       state.distributions
         .filter(d => d.gender == "M")
@@ -418,7 +601,8 @@ export default new Vuex.Store({
     },
     byId: (state, getters) => (entity, id) => {
       return state[entity][getters.indexById(entity)[id]];
-    }
+    },
+    globalSnackbar: state => state.snackbar
   },
   plugins: [createPersistedState()]
 });

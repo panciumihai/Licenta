@@ -5,7 +5,10 @@
       <v-card-title>
         <v-layout class="mx-4 pt-3" row wrap>
           <v-flex>
-            <v-btn dark color="blue">Afiseaza locurile</v-btn>
+            <v-btn flat color="blue" class="ml-3 mr-0" @click="dialog = true">
+              <span class="mr-2">Afiseaza repartizari</span>
+              <v-icon>meeting_room</v-icon>
+            </v-btn>
           </v-flex>
           <v-flex>
             <v-btn dark color="blue">Elimina cererile necofirmate</v-btn>
@@ -62,20 +65,24 @@
         :index="index"
       ></StudentAllocation>
     </v-card>
+    <AllocationsPostDialog v-model="dialog"></AllocationsPostDialog>
   </v-container>
 </template>
 
 <script>
 import StudentAllocation from "@/components/StudentAllocation";
 import Loading from "@/components/Loading";
+import AllocationsPostDialog from "@/components/AllocationsPostDialog";
 
 export default {
   components: {
     StudentAllocation,
-    Loading
+    Loading,
+    AllocationsPostDialog
   },
   data() {
     return {
+      dialog: false,
       selectedYear: "1",
       selectedGender: "M",
       years: ["1", "2", "3", "4", "5"],

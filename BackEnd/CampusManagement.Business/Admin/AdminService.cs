@@ -43,9 +43,12 @@ namespace CampusManagement.Business.Admin
 
         public async Task<Guid> AddAsync(AdminCreateModel entity)
         {
-            var studentRoles = await _genericRepository.GetAllAsync<Role>();
+/*            var studentRoles = await _genericRepository.GetAllAsync<Role>();
 
-            var studentRolesGuid = studentRoles.Where(r => r.Name == "Admin").Select(i => i.Id).ToList();
+            var studentRolesGuid = studentRoles.Where(r => r.Name == "Admin").Select(i => i.Id).ToList();*/
+
+            var studentRolesGuid = _genericRepository.FindAsync<Role>(r => r.Name == "Admin").Result.Select(p => p.Id)
+                .ToList();
 
             var person = Domain.Entities.Person.Create(entity.FirstName, entity.LastName,
                 entity.Email, entity.Gender, _passwordHasher.HashPassword(entity.Password), studentRolesGuid);

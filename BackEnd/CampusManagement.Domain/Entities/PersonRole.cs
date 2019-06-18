@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using CampusManagement.Entities;
 
 namespace CampusManagement.Domain.Entities
 {

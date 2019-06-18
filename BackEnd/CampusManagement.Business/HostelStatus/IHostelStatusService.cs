@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CampusManagement.Business.Generics;
 using CampusManagement.Business.HostelStatus.Models;
+using CampusManagement.Business.Student.Models;
 
 namespace CampusManagement.Business.HostelStatus
 {
@@ -14,6 +15,8 @@ namespace CampusManagement.Business.HostelStatus
         Task<IEnumerable<Guid>> AddOrUpdate(IEnumerable<HostelStatusCreateModel> hostelStatusCreateModel);
 
         Task<IEnumerable<HostelStatusDetailsModel>> GetSeats();
-        Task<IEnumerable<HostelStatusDetailsModel>> SeatsAllocationPreview();
+        Task<IEnumerable<StudentConfirmedDetailsModel>> SeatsAllocationPreview();
+        Task<IEnumerable<HostelStatusDetailsModel>> SeatsAllocation();
+        Task PublishSeats();
     }
 }

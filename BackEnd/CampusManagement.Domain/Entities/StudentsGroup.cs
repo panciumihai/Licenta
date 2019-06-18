@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using CampusManagement.Entities;
 
 namespace CampusManagement.Domain.Entities
 {
     public class StudentsGroup : Entity
     {
         public Guid HostelStatusId { get; private set; }
+        public HostelStatus HostelStatus { get; private set; }
 
         public string Gender { get; private set; }
         public int Year { get; private set; }

@@ -7,7 +7,9 @@ using CampusManagement.Business.Application;
 using CampusManagement.Business.Application.Models;
 using CampusManagement.Business.Generics;
 using CampusManagement.Business.HostelStatus.Models;
+using CampusManagement.Business.Stage;
 using CampusManagement.Business.Student;
+using CampusManagement.Business.Student.Models;
 using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Business.HostelStatus
@@ -17,18 +19,18 @@ namespace CampusManagement.Business.HostelStatus
         private readonly IGenericRepository _genericRepository;
         private readonly IMapper _mapper;
         private readonly IApplicationService _applicationService;
-        private readonly IStudentService _studentService;
+        private readonly IStageService _stageService;
 
         private readonly DetailsService<Domain.Entities.HostelStatus, HostelStatusDetailsModel> _detailsService;
         private readonly CreateService<Domain.Entities.HostelStatus, HostelStatusCreateModel> _createService;
 
         public HostelStatusService(IGenericRepository genericRepository, IMapper mapper, 
-            IApplicationService applicationService, IStudentService studentService)
+            IApplicationService applicationService, IStageService stageService)
         {
             _genericRepository = genericRepository;
             _mapper = mapper;
             _applicationService = applicationService;
-            _studentService = studentService;
+            _stageService = stageService;
 
             _detailsService = new DetailsService<Domain.Entities.HostelStatus, HostelStatusDetailsModel>
                 (genericRepository, mapper);
@@ -73,9 +75,13 @@ namespace CampusManagement.Business.HostelStatus
 
         public async Task<Guid> AddOrUpdate(HostelStatusCreateModel hostelStatusCreateModel)
         {
-            var status = await _genericRepository.GetAllAsync<Domain.Entities.HostelStatus>("StudentsGroups");
+/*            var status = await _genericRepository.GetAllAsync<Domain.Entities.HostelStatus>("StudentsGroups");
 
-            var selectedStatus = status.FirstOrDefault(s => s.HostelId == hostelStatusCreateModel.HostelId);
+            var selectedStatus = status.FirstOrDefault(s => s.HostelId == hostelStatusCreateModel.HostelId);*/
+
+            var selectedStatus =
+                 (await _genericRepository.FindAsync<Domain.Entities.HostelStatus>(
+                    s => s.HostelId == hostelStatusCreateModel.HostelId, "StudentsGroups")).FirstOrDefault();
 
             Guid result;
 
@@ -133,10 +139,10 @@ namespace CampusManagement.Business.HostelStatus
         public async Task<IEnumerable<Guid>> AddOrUpdate(IEnumerable<HostelStatusCreateModel> hostelStatusCreateModels)
         {
             var results = new List<Guid>();
+
             foreach (var status in hostelStatusCreateModels)
-            {
                 results.Append(await AddOrUpdate(status));
-            }
+            
             return results;
         }
 
@@ -171,11 +177,21 @@ namespace CampusManagement.Business.HostelStatus
             return hostelsStatus;
         }
 
-        public async Task<IEnumerable<HostelStatusDetailsModel>> SeatsAllocationPreview()
+        public async Task<IEnumerable<StudentConfirmedDetailsModel>> SeatsAllocationPreview()
         {
-            var hostelsStatus = await _detailsService.GetAllAsync("StudentsGroups");
+            var results = new List<StudentConfirmedDetailsModel>();
+
+            var hostelsStatus = await _detailsService.GetAllAsync("StudentsGroups", "Hostel");
 
             var applications = await _applicationService.GetAllAsync("Student", "Student.Person", "HostelPreferences");
+
+            var stage = await _stageService.GetLastStage();
+
+            if (stage == null)
+                return null;
+
+            applications = applications.Where(a => a.PostedDateTime >= stage.StartDate &&
+                                                   a.PostedDateTime <= stage.EndDate);
 
             var genders = new[] {"F", "M"};
             foreach (var gender in genders)
@@ -183,12 +199,92 @@ namespace CampusManagement.Business.HostelStatus
                 for (int year = 1; year <= 5; ++year)
                 {
                     var specificApplications = SelectApplications(applications, gender, year).ToList();
-
-
                     var availableHostels = hostelsStatus.Select(h => h.HostelId).ToList();
 
                     foreach (var app in specificApplications)
                     {
+                        if (app.Student.Confirmed == true)
+                            continue;
+
+                        app.HostelPreferences.RemoveAll(p => !availableHostels.Contains(p.HostelId));
+
+                        string hostelName = "";
+
+                        foreach (var preference in app.HostelPreferences)
+                        {
+                            try
+                            {
+                                var group = hostelsStatus.FirstOrDefault(s => s.HostelId == preference.HostelId)
+                                    .StudentsGroups.FirstOrDefault(g => g.Gender == gender && g.Year == year);
+
+                                if (group.Seats <= group.Students.Count)
+                                {
+                                    availableHostels.Remove(preference.HostelId);
+                                    continue;
+                                }
+
+                                
+
+                                app.Student.StudentsGroupId = group.Id;
+
+                                hostelsStatus.FirstOrDefault(s => s.HostelId == preference.HostelId)
+                                    .StudentsGroups.FirstOrDefault(g => g.Gender == gender && g.Year == year && g.Seats > g.Students.Count).Students.Add(app.Student);
+
+                            }
+                            catch (Exception e)
+                            {
+                                app.Student.StudentsGroupId = null;
+                                continue;
+                            }
+
+                            var model = _mapper.Map<StudentConfirmedDetailsModel>(app.Student);
+                            model.HostelName = hostelsStatus.FirstOrDefault(h=>h.HostelId == preference.HostelId).Hostel.Name;
+
+                            results.Add(model);
+                            break;
+
+                            //var student = _mapper.Map<Domain.Entities.Student>(app.Student);
+                            //await _genericRepository.UpdateAsync(student);
+                        }
+                        if (app.Student.StudentsGroupId == null)
+                            break;
+                    }
+                }
+            }
+
+            return results;
+        }
+
+        public async Task<IEnumerable<HostelStatusDetailsModel>> SeatsAllocation()
+        {
+            return await _detailsService.GetAllAsync("StudentsGroups", "StudentsGroups.Students", "StudentsGroups.Students.Person");
+
+        }
+
+        public async Task PublishSeats()
+        {
+            var hostelsStatus = await _detailsService.GetAllAsync("StudentsGroups");
+
+            var applications = await _applicationService.GetAllAsync("Student", "Student.Person", "HostelPreferences");
+
+            var stage = await _stageService.GetLastStage();
+
+            applications = applications.Where(a => a.PostedDateTime >= stage.StartDate &&
+                                                   a.PostedDateTime <= stage.EndDate);
+
+            var genders = new[] { "F", "M" };
+            foreach (var gender in genders)
+            {
+                for (int year = 1; year <= 5; ++year)
+                {
+                    var specificApplications = SelectApplications(applications, gender, year).ToList();
+                    var availableHostels = hostelsStatus.Select(h => h.HostelId).ToList();
+
+                    foreach (var app in specificApplications)
+                    {
+                        if (app.Student.Confirmed == true)
+                            continue;
+
                         app.HostelPreferences.RemoveAll(p => !availableHostels.Contains(p.HostelId));
 
                         foreach (var preference in app.HostelPreferences)
@@ -216,18 +312,19 @@ namespace CampusManagement.Business.HostelStatus
                                 continue;
                             }
 
-                            break;
+                            var student = await _genericRepository.GetAsync<Domain.Entities.Student>(app.StudentId);
+                            student.Confirmation(false, app.Student.StudentsGroupId ?? Guid.Empty);
 
-                            //var student = _mapper.Map<Domain.Entities.Student>(app.Student);
-                            //await _genericRepository.UpdateAsync(student);
+                            await _genericRepository.UpdateAsync(student);
+                            await _genericRepository.SaveAsync();
+
+                            break;
                         }
                         if (app.Student.StudentsGroupId == null)
                             break;
                     }
                 }
             }
-
-            return hostelsStatus;
         }
 
         public IOrderedEnumerable<ApplicationDetailsModel> SelectApplications(IEnumerable<ApplicationDetailsModel> applications, 

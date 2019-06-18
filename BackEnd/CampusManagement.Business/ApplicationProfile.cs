@@ -1,13 +1,11 @@
 ﻿using CampusManagement.Business.Admin.Models;
 using CampusManagement.Business.Application.Models;
 using CampusManagement.Business.Article.Models;
-using CampusManagement.Business.Authentication.Models;
 using CampusManagement.Business.Hostel.Models;
 using CampusManagement.Business.HostelStatus.Models;
 using CampusManagement.Business.Person.Models;
-using CampusManagement.Business.Security;
+using CampusManagement.Business.Stage.Models;
 using CampusManagement.Business.Student.Models;
-using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Business
 {
@@ -15,12 +13,6 @@ namespace CampusManagement.Business
     {
         public ApplicationProfile()
         {
-            CreateMap<AccessToken, TokenDetailsModel>()
-                .ForMember(d=>d.AccessToken, opt => opt.MapFrom(s=>s.Token))
-                .ForMember(d=>d.RefreshToken, opt=>opt.MapFrom(s=>s.RefreshToken.Token))
-                .ForMember(d=>d.Expiration, opt=>opt.MapFrom(s=>s.Expiration))
-                .ForMember(d=>d.Person, opt=>opt.MapFrom(s=>s.Person));
-
             CreateMap<Domain.Entities.Person, PersonDetailsModel>();
 
             CreateMap<Domain.Entities.Student, StudentDetailsModel>()
@@ -29,15 +21,22 @@ namespace CampusManagement.Business
                 .ForMember(d => d.Email, opt => opt.MapFrom(s=>s.Person.Email))
                 .ForMember(d => d.Gender, opt => opt.MapFrom(s => s.Person.Gender));
 
+            CreateMap<Domain.Entities.Student, StudentConfirmedDetailsModel>()
+                .ForMember(d => d.HostelName, opt => opt.MapFrom(s => s.StudentsGroup.HostelStatus.Hostel.Name)).ForMember(d => d.FirstName, opt => opt.MapFrom(s => s.Person.FirstName))
+                .ForMember(d => d.LastName, opt => opt.MapFrom(s => s.Person.LastName))
+                .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Person.Email))
+                .ForMember(d => d.Gender, opt => opt.MapFrom(s => s.Person.Gender));
+
             CreateMap<StudentCreateModel, Domain.Entities.Student>();
-/*
-                //.BeforeMap((s, d) => d.Person = Domain.Entities.Person.Create(s.FirstName,s.LastName,s.Email,s.Gender,s.))
-                .ForMember(d => d.Person.FirstName, opt => opt.MapFrom(s => s.FirstName))
-                .ForMember(d => d.Person.LastName, opt => opt.MapFrom(s => s.LastName))
-                .ForMember(d => d.Person.Email, opt => opt.MapFrom(s => s.Email))
-                .ForMember(d => d.Person.Gender, opt => opt.MapFrom(s => s.Gender))
-                .ForMember(d => d.Person.Password, opt => opt.MapFrom(s => s.Password)); //.AfterMap((s, d) => d.SetDefaults());#1#
-*/
+            CreateMap<StudentDetailsModel, StudentConfirmedDetailsModel>();
+            /*
+                            //.BeforeMap((s, d) => d.Person = Domain.Entities.Person.Create(s.FirstName,s.LastName,s.Email,s.Gender,s.))
+                            .ForMember(d => d.Person.FirstName, opt => opt.MapFrom(s => s.FirstName))
+                            .ForMember(d => d.Person.LastName, opt => opt.MapFrom(s => s.LastName))
+                            .ForMember(d => d.Person.Email, opt => opt.MapFrom(s => s.Email))
+                            .ForMember(d => d.Person.Gender, opt => opt.MapFrom(s => s.Gender))
+                            .ForMember(d => d.Person.Password, opt => opt.MapFrom(s => s.Password)); //.AfterMap((s, d) => d.SetDefaults());#1#
+            */
 
             CreateMap<Domain.Entities.Admin, AdminDetailsModel>()
                 .ForMember(d => d.FirstName, opt => opt.MapFrom(s => s.Person.FirstName))
@@ -69,6 +68,9 @@ namespace CampusManagement.Business
 
             CreateMap<Domain.Entities.StudentsGroup, StudentsGroupDetailsModel>();
             CreateMap<StudentsGroupCreateModel, Domain.Entities.StudentsGroup>();
+
+            CreateMap<Domain.Entities.Stage, StageDetailsModel>();
+            CreateMap<StageCreateModel, Domain.Entities.Stage>();
 
             //CreateMap(HostelPreferenceCreateModel, Domain.Entities.HostelPreference);
         }

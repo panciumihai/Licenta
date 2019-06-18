@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using CampusManagement.Entities;
+using CampusManagement.Domain.Entities;
 
 namespace CampusManagement.Business.Generics
 {
