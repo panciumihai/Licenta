@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card>
+    <v-card class="pa-4">
       <v-card-title class="title">Alegeti caminele disponibile pentru BAIETI:</v-card-title>
       <v-card-text>
         <v-layout align-space-around justify-start column>

@@ -16,6 +16,8 @@ import SeatsDistribution from "./views/SeatsDistribution.vue";
 import ConfirmedSeats from "./views/ConfirmedSeats.vue";
 import PublicDistribution from "./views/PublicDistribution.vue";
 import AccommodationDisposition from "./views/AccommodationDisposition.vue";
+import Useful from "./views/Useful.vue";
+import Students from "./views/Students.vue";
 
 import goTo from "vuetify/lib/components/Vuetify/goTo";
 
@@ -143,6 +145,16 @@ export default new Router({
       path: "/accommodationDisposition",
       name: "accommodationDisposition",
       component: AccommodationDisposition
+    },
+    {
+      path: "/useful",
+      name: "useful",
+      component: Useful
+    },
+    {
+      path: "/students",
+      name: "students",
+      component: Students
     }
   ]
 });

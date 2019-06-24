@@ -71,17 +71,24 @@
         <v-btn color="blue darken-1" flat="flat" @click="addStage(true)">Confirmă</v-btn>
       </v-card-actions>
     </v-card>
+    <LoadingDialog v-model="loadingDialog"></LoadingDialog>
   </v-dialog>
 </template>
 
 <script>
+import LoadingDialog from "@/components/LoadingDialog";
+
 export default {
+  components: {
+    LoadingDialog
+  },
   props: {
     value: Boolean
   },
   data() {
     0;
     return {
+      loadingDialog: false,
       startDateMenu: false,
       endDateMenu: false,
       stage: {
@@ -104,6 +111,7 @@ export default {
   methods: {
     addStage(decision) {
       if (decision) {
+        this.loadingDialog = true;
         this.$store
           .dispatch("addStage", this.stage)
           .then(response => {
@@ -112,6 +120,7 @@ export default {
               color: "success"
             });
             this.$store.dispatch("getStage");
+            this.loadingDialog = false;
             console.log(response);
           })
           .catch(error => {
@@ -119,6 +128,7 @@ export default {
               text: "Hopa! Turul nu a putut fi aduagat!",
               color: "error"
             });
+            this.loadingDialog = false;
             console.log(error);
           });
       }

@@ -153,7 +153,7 @@ export default {
           icon: "keyboard_arrow_right",
           route: "/publicDistribution"
         },
-        { title: "Utile", icon: "keyboard_arrow_right", route: "/cantina" },
+        { title: "Utile", icon: "keyboard_arrow_right", route: "/useful" },
         { title: "Contact", icon: "keyboard_arrow_right", route: "/contact" }
       ]
     };
@@ -170,6 +170,11 @@ export default {
       let drawerItems = [];
       if (this.isAdmin)
         drawerItems = [
+          {
+            title: "Adauga studenti",
+            action: "person_add",
+            route: "students"
+          },
           {
             title: "Adauga articol",
             action: "list_alt",

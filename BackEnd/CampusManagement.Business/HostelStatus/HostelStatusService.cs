@@ -190,8 +190,8 @@ namespace CampusManagement.Business.HostelStatus
             if (stage == null)
                 return null;
 
-            applications = applications.Where(a => a.PostedDateTime >= stage.StartDate &&
-                                                   a.PostedDateTime <= stage.EndDate);
+            applications = applications.Where(a => a.PostedDateTime.Date >= stage.StartDate.Date &&
+                                                   a.PostedDateTime.Date <= stage.EndDate.Date);
 
             var genders = new[] {"F", "M"};
             foreach (var gender in genders)

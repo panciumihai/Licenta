@@ -5,6 +5,18 @@
         <v-layout justify-center>
           <div class="headline mb-3">{{ "Caminul " + hostel.name }}</div>
         </v-layout>
+        <v-layout justify-center>
+          <div
+            class="title mb-3 red--text"
+            v-show="femaleTypedSeats != hostelStatus.femaleSeats"
+          >{{ "Locurile introduse pentru fete sunt diferite de total! Locuri scrise "+femaleTypedSeats +" iar totalul este " + hostelStatus.femaleSeats }}</div>
+        </v-layout>
+        <v-layout justify-center>
+          <div
+            class="title mb-3 red--text"
+            v-show="maleTypedSeats != hostelStatus.maleSeats"
+          >{{ "Locurile introduse pentru baieti sunt diferite de total! Locuri scrise "+maleTypedSeats +" iar totalul este " + hostelStatus.maleSeats }}</div>
+        </v-layout>
       </v-flex>
       <v-flex xs12 md2>
         <v-layout class="pb-1" row align-center justify-center fill-height>
@@ -83,10 +95,26 @@ export default {
         .filter(s => s.gender == "M")
         .sort(this.compareStudentsGroupsYear);
     },
+    maleTypedSeats() {
+      let total = 0;
+      this.maleStudentsGroups.forEach(g => {
+        let numar = parseInt(g.seats);
+        if (!isNaN(numar)) total += numar;
+      });
+      return total;
+    },
     femaleStudentsGroups() {
       return this.hostelStatus.studentsGroups
         .filter(s => s.gender == "F")
         .sort(this.compareStudentsGroupsYear);
+    },
+    femaleTypedSeats() {
+      let total = 0;
+      this.femaleStudentsGroups.forEach(g => {
+        let numar = parseInt(g.seats);
+        if (!isNaN(numar)) total += numar;
+      });
+      return total;
     }
   }
 };

@@ -28,9 +28,7 @@
           >Posteaza locurile</v-btn>
         </v-flex>
         <v-flex xs md3 class="px-2">
-          <v-btn block dark color="blue" depressed>
-            <JsonExcel :data="filteredAllocations">Descarca Excel</JsonExcel>
-          </v-btn>
+          <v-btn block dark color="blue" depressed @click="downloadExcel()">DESCARCA EXCEL</v-btn>
         </v-flex>
         <v-flex xs md3 class="px-2">
           <v-btn
@@ -103,20 +101,20 @@ import StageGenerateDialog from "@/components/StageGenerateDialog";
 import StudentConfirmationDialog from "@/components/StudentConfirmationDialog";
 import PublicSeatsDialog from "@/components/PublicSeatsDialog";
 
-import JsonExcel from "vue-json-excel";
+import XLSX from "xlsx";
 
 export default {
   components: {
     StageGenerateDialog,
     StudentConfirmationDialog,
-    PublicSeatsDialog,
-    JsonExcel
+    PublicSeatsDialog
   },
   data() {
     return {
       studentConfimationDialog: false,
       applicationFilterDialog: false,
       publicSeatsDialog: false,
+      loadingDialog: false,
       studentsAllocationModels: [],
       years: ["1", "2", "3", "4", "5"],
       genders: ["M", "F"],
@@ -143,6 +141,59 @@ export default {
     };
   },
   methods: {
+    downloadExcel() {
+      var auxYear = this.selectedYear;
+      var auxGender = this.selectedGender;
+      var auxSearch = this.search;
+      var studentsExcel = XLSX.utils.book_new();
+      for (var i = 1; i <= 5; ++i) {
+        this.genders.forEach(g => {
+          this.selectedYear = i;
+          this.selectedGender = g;
+          let sheetData = this.filteredAllocations.map(s => {
+            return {
+              "An studiu": s.year,
+              Nationalitate: s.nationality,
+              "Nume si prenume": s.fullName,
+              Sex: s.gender,
+              CNP: s.cnp,
+              "Punctaj 1": s.score,
+              "Punctaj 2": s.secondScore,
+              Camin: s.hostelName
+            };
+          });
+          var ws = XLSX.utils.json_to_sheet(sheetData); //, { header: ["hostelName", "fullName"]}
+          var wscols = [
+            { wch: 10 },
+            { wch: 15 },
+            { wch: 20 },
+            { wch: 5 },
+            { wch: 15 },
+            { wch: 10 },
+            { wch: 10 },
+            { wch: 15 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 }
+          ];
+          ws["!cols"] = wscols;
+
+          XLSX.utils.book_append_sheet(
+            studentsExcel,
+            ws,
+            "Anul " + i + " " + g
+          );
+        });
+      }
+      this.selectedYear = auxYear;
+      this.selectedGender = auxGender;
+      this.search = auxSearch;
+      XLSX.writeFile(studentsExcel, "repartizari.xlsx");
+    },
     setStudentsAllocation() {
       this.studentsAllocationModels = this.studentsAllocations.map(s => {
         return {

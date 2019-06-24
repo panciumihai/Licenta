@@ -14,9 +14,20 @@ export default {
   data() {
     return {};
   },
+  methods: {
+    compareByDate(a, b) {
+      let comparison = 0;
+
+      if (a.postedDateTime < b.postedDateTime) comparison = -1;
+      else if (a.postedDateTime > b.postedDateTime) comparison = 1;
+
+      return comparison;
+    }
+  },
   computed: {
     articles() {
-      return this.$store.getters.articles;
+      let articles = this.$store.getters.articles;
+      return articles.sort(this.compareByDate);
     }
   },
   created() {

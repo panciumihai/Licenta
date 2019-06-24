@@ -2,7 +2,7 @@
   <v-container fill-height>
     <Loading v-if="!isLoaded"></Loading>
     <v-card v-else>
-      <v-card-title class="mx-3 mt-3 mb-1 pb-1 display-2">{{ article.title }}</v-card-title>
+      <v-card-title class="mx-3 mt-3 mb-1 pb-1 display-1">{{ article.title }}</v-card-title>
       <v-card-text class="mt-1">
         <v-layout row wrap>
           <v-flex xs12 md12 class="pb-3 px-3">

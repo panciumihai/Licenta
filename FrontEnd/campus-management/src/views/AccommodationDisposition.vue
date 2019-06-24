@@ -2,7 +2,7 @@
   <v-container>
     <v-card>
       <v-card-title>
-        <div class="display-1 mx-3">Dispozitie de cazare</div>
+        <div class="headline mx-3 font-weight-medium">Dispozitie de cazare</div>
       </v-card-title>
       <v-card-text v-if="student.studentsGroupId != null">
         <v-layout row wrap>
@@ -15,7 +15,7 @@
           <v-flex class="ma-3">
             <div class="headline">
               Ai fost repartizat in caminul
-              <span class="blue--text">{{student.hostelName}}</span>. Pentru a ocupa locul trebuie sa descarci dispozitia de cazare de mai jos si sa te prezenti cu ea tiparita la administratorul de cazari.
+              <span class="blue--text">{{student.hostelName}}</span>. Pentru a ocupa locul trebuie sa descarci dispozitia de cazare de mai jos si sa te prezinti cu ea tiparita la administratorul de cazari.
               <span
                 class="headline green--text"
               >Succes!</span>
@@ -32,7 +32,7 @@
         <v-layout row wrap>
           <v-flex xs12 md12>
             <v-layout justify-center>
-              <div class="headline ma-3 red--text">Nu aveti nicio displozitie de cazare.</div>
+              <div class="headline ma-3 red--text">Nu aveti nicio dispozitie de cazare.</div>
             </v-layout>
           </v-flex>
           <v-flex xs12 md12>

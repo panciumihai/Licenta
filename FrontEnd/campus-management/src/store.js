@@ -375,7 +375,6 @@ export default new Vuex.Store({
     getStudents({ state, commit }) {
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + state.token.accessToken;
-      axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 
       axios
         .get("Students")
@@ -385,6 +384,20 @@ export default new Vuex.Store({
         .catch(error => {
           console.log(error);
         });
+    },
+    addStudent({ state }, student) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + state.token.accessToken;
+
+      return new Promise((resolve, reject) => {
+        axios
+          .post("Students", student)
+          .then(response => resolve(response))
+          .catch(error => {
+            console.log(error);
+            reject(error);
+          });
+      });
     },
     addStudentsAllocations({ state }, studentsAllocations) {
       axios.defaults.headers.common["Authorization"] =

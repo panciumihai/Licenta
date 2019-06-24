@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    <v-card>
-      <v-card-title class="title mb-1">Scrieti anuntul dorit</v-card-title>
+    <v-card class="pa-3">
+      <v-card-title class="title mb-1">Scrieti articolul dorit</v-card-title>
       <v-card-text class="mt-0">
         <v-layout column wrap>
           <v-flex>
@@ -112,16 +112,20 @@ export default {
 
       this.$store
         .dispatch("addArticle", formData)
-        .then(
-          (this.snackbar.text = "Articol adaugat cu succes!"),
-          (this.snackbar.color = "success"),
-          (this.snackbar.active = true)
-        )
-        .catch(
-          (this.snackbar.text = "Hopa! Articolul nu a putut fi adaugat!"),
-          (this.snackbar.color = "error"),
-          (this.snackbar.active = true)
-        );
+        .then(result => {
+          this.$store.dispatch("showSnackbar", {
+            text: "Articolul a fost adaugat cu succes!",
+            color: "success"
+          });
+          console.log(result);
+        })
+        .catch(error => {
+          this.$store.dispatch("showSnackbar", {
+            text: "Hopa! Articolul nu putut fi adaugat!",
+            color: "error"
+          });
+          console.log(error);
+        });
     }
   },
   created: {}

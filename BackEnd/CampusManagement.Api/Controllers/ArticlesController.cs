@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using CampusManagement.Business.Admin;
 using CampusManagement.Business.Article;
@@ -71,7 +72,7 @@ namespace CampusManagement.Api.Controllers
 
             var filePath = await _fileService.SaveOnDisk(file);
             articleCreateModel.Image = filePath ?? "Uploads/default_article.png";
-            var personId = Guid.Parse(User.Claims.First(c => c.Type == "PersonId").Value);
+            var personId = Guid.Parse(User.Claims.First(c => c.Type == ClaimTypes.Name).Value);
             var admin = await _adminService.GetAdminByPersonId(personId);
             articleCreateModel.AdminId = admin.Id;
 
@@ -112,7 +113,7 @@ namespace CampusManagement.Api.Controllers
             return NoContent();
         }
 
-        // DELETE api/values/5
+        //[Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

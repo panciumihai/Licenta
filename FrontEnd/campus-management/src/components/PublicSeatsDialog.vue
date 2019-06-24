@@ -13,19 +13,31 @@
         <v-btn color="blue darken-1" flat="flat" @click="publishSeats(true)">Confirmă</v-btn>
       </v-card-actions>
     </v-card>
+    <LoadingDialog v-model="loadingDialog"></LoadingDialog>
   </v-dialog>
 </template>
 
 <script>
+import LoadingDialog from "@/components/LoadingDialog";
+
 export default {
+  components: {
+    LoadingDialog
+  },
   props: {
     value: Boolean,
     stage: {},
     studentsAllocations: {}
   },
+  data() {
+    return {
+      loadingDialog: false
+    };
+  },
   methods: {
     publishSeats(decision) {
-      if (decision)
+      if (decision) {
+        this.loadingDialog = true;
         this.$store
           .dispatch("addStudentsAllocations", this.studentsAllocations)
           .then(response => {
@@ -33,6 +45,7 @@ export default {
               text: "Turul a fost publicat cu succes!",
               color: "success"
             });
+            this.loadingDialog = false;
             console.log(response);
           })
           .catch(error => {
@@ -41,7 +54,9 @@ export default {
               color: "error"
             });
             console.log(error);
+            this.loadingDialog = false;
           });
+      }
       this.show = false;
     }
   },

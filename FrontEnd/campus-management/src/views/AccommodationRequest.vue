@@ -1,7 +1,7 @@
 <template>
   <div class="accommodation-request">
     <v-container>
-      <v-card>
+      <v-card class="pa-4">
         <v-form>
           <v-card-title class="display-1">{{ title }}</v-card-title>
           <v-card-text>
@@ -143,7 +143,22 @@ export default {
       );
       this.application.specialCases = this.application.specialCases.substr(2);
       //console.log(this.application.hostelPreferences);
-      this.$store.dispatch("addApplication", this.application);
+      this.$store
+        .dispatch("addApplication", this.application)
+        .then(response => {
+          this.$store.dispatch("showSnackbar", {
+            text: "Cererea a fost trimisa cu succes!",
+            color: "success"
+          });
+          console.log(response);
+        })
+        .catch(error => {
+          this.$store.dispatch("showSnackbar", {
+            text: "Hopa! Cererea nu a putut fi trimisa!",
+            color: "error"
+          });
+          console.log(error);
+        });
     }
   },
   computed: {
