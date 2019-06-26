@@ -1,0 +1,66 @@
+{
+  "name": "campus-management",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "alasql": "^0.4.11",
+    "axios": "^0.19.0",
+    "convert-csv-to-json": "0.0.14",
+    "csvtojson": "^2.0.8",
+    "es6-promise": "^4.2.6",
+    "jspdf": "^1.5.3",
+    "vue": "^2.6.6",
+    "vue-axios": "^2.1.4",
+    "vue-json-csv": "^1.2.4",
+    "vue-json-excel": "^0.2.98",
+    "vue-quill-editor": "^3.0.6",
+    "vue-router": "^3.0.1",
+    "vue-wysiwyg": "^1.7.2",
+    "vuetify": "^1.5.5",
+    "vuex": "^3.1.0",
+    "vuex-persistedstate": "^2.5.4",
+    "xlsx": "^0.14.3"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.5.0",
+    "@vue/cli-plugin-eslint": "^3.5.0",
+    "@vue/cli-service": "^3.6.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.8.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+    "vue-cli-plugin-vuetify": "^0.5.0",
+    "vue-template-compiler": "^2.5.21",
+    "vuetify-loader": "^1.0.5"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}
