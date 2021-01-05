@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "alasql": "^0.4.11",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "convert-csv-to-json": "0.0.14",
     "csvtojson": "^2.0.8",
     "es6-promise": "^4.2.6",
