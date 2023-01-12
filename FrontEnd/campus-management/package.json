@@ -16,7 +16,7 @@
     "jspdf": "^1.5.3",
     "vue": "^2.6.6",
     "vue-axios": "^2.1.4",
-    "vue-json-csv": "^1.2.4",
+    "vue-json-csv": "^1.2.12",
     "vue-json-excel": "^0.2.98",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.1",
